@@ -1,7 +1,7 @@
-# sifa_correction
+# sinai_smartjustice_frontend
 
-#### 介绍
-社区矫正系统前端
+#### 项目介绍
+锡山智慧法务系统前端
 
 #### 软件架构
 软件架构说明
@@ -21,7 +21,7 @@
 
 #### 参与贡献
 
-1. Fork 本仓库
+1. Fork 本项目
 2. 新建 Feat_xxx 分支
 3. 提交代码
 4. 新建 Pull Request
