@@ -1,16 +1,14 @@
 <template>
   <div>
     <div class="title">
-      <span class="big">字典数据</span>
-      <span class="small">管理字典数据</span>
-      <!-- v-has="'Pages.Foundations.DicData.Create'" -->
-      <el-button type="primary" icon="el-icon-edit" @click="handleAdd('添加字典数据')" class="btn">添加字典数据</el-button>
+      <span class="big">警报</span>
+      <span class="small">警报</span>
     </div>
     <!--表格-->
     <div class="container">
       <div class="handle-box">
         <el-input v-model="ruleForm.filter" placeholder="筛选关键词" class="handle-input" @keyup.enter.native="getData"></el-input>
-        <el-select class="sel" v-model="ruleForm.type" @change="getData()" placeholder="根据数据类型搜索">
+        <el-select class="sel" v-model="ruleForm.alarmType" @change="getData()" placeholder="根据警报类型搜索">
               <el-option v-for="item in types" :key="item.key" :label="item.value" :value="item.key">
               </el-option>
             </el-select>
@@ -25,11 +23,12 @@
                   <i class="el-icon-menu"></i>
                 </span>
                 <el-dropdown-menu slot="dropdown">
-                  <!-- v-has="'Pages.Foundations.DicData.Edit'" -->
                   <el-dropdown-item>
-                    <p @click="handleEdit('修改')">修改</p>
+                    <p @click="handleEdit()">详情</p>
                   </el-dropdown-item>
-                  <!-- v-has="'Pages.Foundations.DicData.Delete'" -->
+                  <el-dropdown-item>
+                    <p @click="processVisible = true">处理</p>
+                  </el-dropdown-item>
                   <el-dropdown-item>
                     <p @click="handleDelete(scope.$index, scope.row)">删除</p>
                   </el-dropdown-item>
@@ -37,13 +36,19 @@
               </el-dropdown>
             </template>
           </el-table-column>
-          <el-table-column prop="key" label="键值" width="100px" sortable='custom'>
+          <el-table-column prop="personName" label="人员" min-width="120px" sortable='custom'>
           </el-table-column>
-          <el-table-column prop="value" label="内容" sortable='custom'>
+          <el-table-column prop="longitude" label="经度" min-width="100px" sortable='custom'>
           </el-table-column>
-          <el-table-column prop="typeText" label="类型" sortable='custom'>
+          <el-table-column prop="latitude" label="纬度" min-width="100px"  sortable='custom'>
           </el-table-column>
-          <el-table-column prop="extendData" label="备注" sortable='custom'>
+          <el-table-column prop="radius" label="范围"  min-width="110px"  sortable='custom'>
+          </el-table-column>
+          <el-table-column prop="address" label="地址"  min-width="110px"  sortable='custom'>
+          </el-table-column>
+          <el-table-column prop="processed" label="是否处理"  min-width="110px"  sortable='custom'>
+          </el-table-column>
+          <el-table-column prop="locTime" :formatter="formatTableDate" label="时间" sortable='custom' width="140px">
           </el-table-column>
         </el-table>
       </div>
@@ -53,27 +58,44 @@
       </div>
     </div>
     <!-- 添加、编辑弹出框 -->
-    <el-dialog :title="titleT" :visible.sync="addVisible" width="600px">
-      <el-form ref="creatOrEditForm" :model="editForm" :rules="rules">
-        <el-form-item v-show="titleT=='添加字典数据'" prop="type">
-          <el-select class="seldialogn" v-model="editForm.type" placeholder="选择数据类型">
-            <el-option v-for="item in types" :key="item.key" :label="item.value" :value="item.key">
-            </el-option>
-          </el-select>
+    <el-dialog title="警报详情" :visible.sync="addVisible" width="600px">
+      <el-form ref="creatOrEditForm" :model="editForm" disabled>
+        <el-form-item label="人员" prop="personName">
+          <el-input v-model="editForm.personName"></el-input>
         </el-form-item>
-        <el-form-item label="键值" prop="key">
-          <el-input v-model="editForm.key"></el-input>
+        <el-form-item label="经度" prop="longitude">
+          <el-input v-model="editForm.longitude"></el-input>
         </el-form-item>
-        <el-form-item label="内容" prop="value">
-          <el-input v-model="editForm.value"></el-input>
+        <el-form-item label="纬度" prop="latitude">
+          <el-input v-model="editForm.latitude"></el-input>
         </el-form-item>
-        <el-form-item label="备注" prop="extendData">
-          <el-input v-model="editForm.extendData"></el-input>
+        <el-form-item label="范围" prop="radius">
+          <el-input v-model="editForm.radius"></el-input>
+        </el-form-item>
+        <el-form-item label="地址" prop="address">
+          <el-input v-model="editForm.address"></el-input>
+        </el-form-item>
+        <el-form-item label="是否处理" prop="processed">
+          <el-input v-model="editForm.processed"></el-input>
+        </el-form-item>
+        <el-form-item label="日期" prop="locTime">
+          <el-input v-model="editForm.locTime"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="addVisible = false">取 消</el-button>
-        <el-button type="primary" @click="CreateOrUpdate('creatOrEditForm')">确 定</el-button>
+      </span>
+    </el-dialog>
+
+   <el-dialog title="处理报警" :visible.sync="processVisible" :close-on-click-modal="false" width="600px">
+      <el-form ref="processForm" :model="processForm" :rules="processRules">
+        <el-form-item label="处理结果" prop="processResult">
+          <el-input type="textarea" :rows="4"  v-model="processForm.processResult"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="processVisible = false">取 消</el-button>
+        <el-button type="primary" @click="ProcessResult('processForm')">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -82,40 +104,43 @@
 
 <script>
 import Api from "@/kites/api";
+import { changeDate,changeDateTime } from "@/utils/date";
 import { Post, Get, Delete, Put } from "@/api/api";
 export default {
-  name: "dicData",
+  name: "alarm",
   data() {
     return {
-      titleT: "",
       tableData: [],
       cur_page: 1,
       totalCount: 0,
       addVisible: false,
+      processVisible: false,
       ruleForm: {
         filter: "",
-        sorting: "DateAdded desc",
+        sorting: "locTime desc",
         maxResultCount: 10,
         skipCount: 0,
-        type: ""
+        alarmType: ""
       },
       id: "",
       editForm: {
-        key: "",
-        value: "",
-        extendData: "",
-        type: ""
+       
       },
-      types:[],
+      processForm:{
+       processResult:''
+      },
+      types:[{key:1,value:'出围栏'},{key:2,value:'入围栏'},{key:3,value:'设备被损坏'},{key:4,value:'低电量'},{key:5,value:'设备关机'}],
       rules: {
         key: [{ required: true, message: "必填", trigger: "blur" }],
         value: [{ required: true, message: "必填", trigger: "blur" }],
         type: [{ required: true, message: "请选择", trigger: "change" }]
-      }
+      },
+      processRules: {
+        processResult: [{ required: true, message: "必填", trigger: "blur" }]
+      },
     };
   },
   created() {
-    this.GetDicTypes();
     this.getData();
   },
   computed: {
@@ -150,14 +175,15 @@ export default {
       this.ruleForm.maxResultCount = val;
       this.getData();
     },
-    CreateOrUpdate(formName) {
+    formatTableDate(row, column) {
+      if (row[column.property] !== null) {
+        return changeDateTime(row[column.property]);
+      }
+    },
+    ProcessResult(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          if (this.titleT == "添加字典数据") {
-            this.Create();
-          } else {
-            this.Update();
-          }
+          this.AlarmProcess()
         } else {
           console.log("error submit!!");
           return false;
@@ -169,7 +195,7 @@ export default {
       this.ruleForm.skipCount =
         (this.cur_page - 1) * this.ruleForm.maxResultCount;
       try {
-        const res = await Post(Api.GetDicList, this.ruleForm);
+        const res = await Post(Api.GetAlarmList, this.ruleForm);
         if (res) {
           this.tableData = res.items;
           this.totalCount = res.totalCount;
@@ -192,7 +218,7 @@ export default {
     },
     async delTemplateMsg() {
       try {
-        const res = await Delete(Api.DicData + this.id);     
+        const res = await Delete(Api.Alarm + this.id);     
         this.$message.success("删除成功");
         this.getData();     
       } catch (e) {
@@ -200,11 +226,10 @@ export default {
       }
     },
     // 获取编辑页面
-    async handleEdit(title) {
+    async handleEdit() {
       this.addVisible = true;
-      this.titleT = title;
       try {
-        const res = await Get(Api.DicData + this.id);
+        const res = await Get(Api.Alarm + this.id);
         if (res) {
           this.editForm = res;
         }
@@ -212,39 +237,13 @@ export default {
         console.log(e);
       }
     },
-    // 获取分类
-    async GetDicTypes() {
+    async AlarmProcess() {
       try {
-        const res = await Get(Api.GetDicTypes, {});
-        if (res) {
-          this.types = res;
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    },
-    //添加
-    handleAdd(title) {
-      this.$delete(this.editForm, "id");
-      this.titleT = title;
-      this.addVisible = true;
-    },
-     async Create() {
-      try {
-        const res = await Post(Api.CreateDicData, this.editForm);
+        const res = await Put(Api.AlarmProcess,this.processForm);
         this.$message.success("操作成功");
         this.getData();
-        this.addVisible = false;
-      } catch (e) {
-        console.log(e);
-      }
-    },
-    async Update() {
-      try {
-        const res = await Put(Api.DicData + this.id, this.editForm);
-        this.$message.success("操作成功");
-        this.getData();
-        this.addVisible = false;
+        this.processVisible = false;
+        
       } catch (e) {
         console.log(e);
       }

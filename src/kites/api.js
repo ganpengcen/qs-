@@ -58,7 +58,10 @@ export default {
 	GetUserRoleList: '/api/services/app/user/GetUserRoleList',//获取权限列表
 	
 	//---------------------------字典数据--------------------------------------
-	GetDicDatasByType: '/api/services/app/dicData/GetDicDatasByType',
+	GetDicTypes:'/api/dicData/types',
+	GetDicList:'/api/dicData/list',
+	DicData:'/api/dicData/',
+	CreateDicData:'/api/dicData',
 	//----------------------------frontWeb-----------------------------------
 	GetSelectionDatasByType: '/api/services/app/frontWeb/GetSelectionDatasByType',//获取下拉列表数据
 	GetDistricts: '/api/services/app/frontWeb/GetDistricts',//获取区域列表
@@ -67,6 +70,8 @@ export default {
 	GetDeviceList:'/api/device/list',//获取设备列表
 	CreateDevice:'/api/device',
 	Device:'/api/device/',
+	GetDevice:'/api/device/list/',
+	ActiveDevice:'/api/device/active/',
 
 	//----------------------------区域管理-----------------------------------
 	GetAreaList:'/api/area/list',
@@ -74,9 +79,33 @@ export default {
 	CreateArea:'/api/area',
 	Area:'/api/area/',
 
+	//----------------------------围栏管理-----------------------------------
+	GetFenceList:'/api/fence/list',
+	CreateFence:'/api/fence',
+	Fence:'/api/fence/',
+
+	//----------------------------轨迹-----------------------------------
+	
+	TrackingLine:'/api/tracking/line',
+
 	//----------------------------监管人员管理-----------------------------------
 	GetPersonList:'/api/person/list',
+	GetPersonByArea:'/api/person/area/',
 	CreatePerson:'/api/person',
 	Person:'/api/person/',
+	BindDevice:'/api/person/bind',
+	Unbind:'/api/person/unbind/',
+	//----------------------------业务管理-----------------------------------
+	// 报警
+	GetAlarmList:'/api/alarm/list',
+	Alarm:'/api/alarm/',
+	AlarmProcess:'/api/alarm/process/',
+	// 学习
+	GetStudyRecordList:'/api/studyRecord/list',
+	StudyRecord:'/api/studyRecord/',
+	
+    // 服务
+	GetServiceRecordList:'/api/serviceRecord/list',
+	ServiceRecord:'/api/serviceRecord/'
 
 }

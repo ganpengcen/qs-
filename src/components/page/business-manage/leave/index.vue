@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="title">
-      <span class="big">区域列表</span>
-      <span class="small">区域维护，可以添加编辑区域，可以查看各个区域的矫正人员数以及正在矫正的数量</span>
+      <span class="big">请假</span>
+      <span class="small"></span>
       <!-- v-has="'Pages.Foundations.DicData.Create'" -->
       <el-button type="primary" icon="el-icon-edit" @click="handleAdd('添加区域')" class="btn">添加新区域</el-button>
     </div>
@@ -83,7 +83,7 @@ import Api from "@/kites/api";
 import { changeDate } from "@/utils/date";
 import { Post, Get, Delete, Put } from "@/api/api";
 export default {
-  name: "areaList",
+  name: "leave",
   data() {
     return {
       titleT: "",

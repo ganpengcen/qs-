@@ -15,37 +15,17 @@
           class="handle-input"
           @keyup.enter.native="getData"
         ></el-input>
+        <el-select
+          class="sel"
+          clearable
+          v-model="ruleForm.areaId"
+          @change="getData()"
+          placeholder="根据区域搜索"
+        >
+          <el-option v-for="item in areas" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
         <el-button type="primary" icon="search" @click="getData()">搜索</el-button>
       </div>
-      <el-collapse class="collapse">
-        <el-collapse-item title="显示高级过滤">
-          <div>
-            <el-select
-              class="sel"
-              clearable
-              v-model="ruleForm.type"
-              @change="getData()"
-              placeholder="根据状态搜索"
-            >
-              <el-option
-                v-for="item in types"
-                :key="item.value"
-                :label="item.displayText"
-                :value="item.value"
-              ></el-option>
-            </el-select>
-            <el-select
-              class="sel"
-              clearable
-              v-model="ruleForm.areaId"
-              @change="getData()"
-              placeholder="根据区域搜索"
-            >
-              <el-option v-for="item in areas" :key="item.id" :label="item.name" :value="item.id"></el-option>
-            </el-select>
-          </div>
-        </el-collapse-item>
-      </el-collapse>
       <div class="tableThCol">
         <el-table
           :data="data"
@@ -66,17 +46,23 @@
                     <p @click="handleEdit('修改')">修改</p>
                   </el-dropdown-item>
                   <el-dropdown-item>
+                    <p @click="bindVisible = true">绑定</p>
+                  </el-dropdown-item>
+                  <el-dropdown-item>
+                    <p @click="Unbind()">解绑</p>
+                  </el-dropdown-item>
+                  <el-dropdown-item>
                     <p @click="handleDelete(scope.$index, scope.row)">删除</p>
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </template>
           </el-table-column>
+          <el-table-column prop="areaName" label="区域" min-width="120px" sortable="custom"></el-table-column>
           <el-table-column prop="name" label="姓名" min-width="120px" sortable="custom"></el-table-column>
-          <el-table-column  prop="gender" label="性别" sortable="custom"></el-table-column>
+          <el-table-column prop="gender" label="性别" sortable="custom"></el-table-column>
           <el-table-column prop="phone" label="手机号码" min-width="120px" sortable="custom"></el-table-column>
           <el-table-column prop="identityCard" label="身份证号码" min-width="160px" sortable="custom"></el-table-column>
-          <el-table-column prop="areaName" label="地区" min-width="120px" sortable="custom"></el-table-column>
           <el-table-column
             prop="beginDate"
             :formatter="formatTableDate"
@@ -84,17 +70,17 @@
             sortable="custom"
             width="140px"
           ></el-table-column>
-            <el-table-column
+          <el-table-column
             prop="endDate"
             :formatter="formatTableDate"
             label="结束日期"
             sortable="custom"
             width="140px"
           ></el-table-column>
-            <el-table-column
+          <el-table-column
             prop="dateAdded"
             :formatter="formatTableDate"
-            label="添加日期"
+            label="创建日期"
             sortable="custom"
             width="140px"
           ></el-table-column>
@@ -192,6 +178,24 @@
         <el-button type="primary" @click="CreateOrUpdateDicData('creatOrEditForm')">确 定</el-button>
       </span>
     </el-dialog>
+    <el-dialog title="绑定设备" :visible.sync="bindVisible" width="600px">
+      <el-form ref="bindForm" :model="bindForm" :rules="bindRules">
+        <el-form-item prop="areaId" label="选择区域">
+          <el-select class="seldialogn" @change="GetDevice()" v-model="areaId" placeholder="请选择">
+            <el-option v-for="item in areas" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item prop="serialNo" label="选择设备" v-if="areaId != ''">
+          <el-select class="seldialogn"  v-model="bindForm.serialNo" placeholder="请选择">
+            <el-option v-for="item in deviceList" :key="item.serialNo" :label="item.serialNo" :value="item.serialNo"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="bindVisible = false">取 消</el-button>
+        <el-button type="primary" @click="BindDevice('bindForm')">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -209,6 +213,7 @@ export default {
       cur_page: 1,
       totalCount: 0,
       addVisible: false,
+      bindVisible: false,
       pickerOptions2: DatePicker,
       ruleForm: {
         filter: "",
@@ -218,20 +223,6 @@ export default {
         skipCount: 0
       },
       id: "",
-      MonitoredTypes: [
-        {
-          key: "JZ-001",
-          value: "缓刑"
-        },
-        {
-          key: "JZ-002",
-          value: "假释"
-        },
-        {
-          key: "JZ-003",
-          value: "暂予监外执行"
-        }
-      ],
       genderList: [
         {
           id: 1,
@@ -259,6 +250,13 @@ export default {
         emergencyRelation: "",
         remark: ""
       },
+      bindForm: {
+        serialNo: "",
+        personId: ""
+      },
+      areaId:"",
+      MonitoredTypes: [],
+      deviceList:[],
       types: [
         { value: 1, displayText: "未绑定" },
         { value: 2, displayText: "已绑定" },
@@ -276,10 +274,14 @@ export default {
         type: [{ required: true, message: "请选择", trigger: "change" }],
         beginDate: [{ required: true, message: "请选择", trigger: "change" }],
         endDate: [{ required: true, message: "请选择", trigger: "change" }]
+      },
+      bindRules:{
+        serialNo: [{ required: true, message: "请选择", trigger: "change" }],
       }
     };
   },
   created() {
+    this.getDicType(1);
     this.GetAllArea();
     this.getData();
     this.end = new Date();
@@ -350,6 +352,20 @@ export default {
         }
       });
     },
+    BindDevice(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+         if (this.areaId == '') {
+           this.$message.warning('请选择区域');
+           return;
+         }
+         this.bind();
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
     // 获取列表数据
     async getData() {
       this.ruleForm.skipCount =
@@ -386,6 +402,26 @@ export default {
         console.log(e);
       }
     },
+    Unbind(){
+      this.$confirm("确定对该人员设备进行解绑操作？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.unbindPerson();
+        })
+        .catch(() => {});
+    },
+     async unbindPerson() {
+      try {
+        const res = await Put(Api.Unbind + this.id);
+        this.$message.success("解绑成功");
+        this.getData();
+      } catch (e) {
+        console.log(e);
+      }
+    },
     // 获取编辑页面
     async handleEdit(title) {
       this.addVisible = true;
@@ -402,9 +438,24 @@ export default {
     async GetAllArea() {
       try {
         const res = await Get(Api.GetAllArea, {});
-        if (res.length !== 0) {
-          this.areas = res;
-        }
+        this.areas = res;
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async GetDevice() {
+      this.bindForm.serialNo = '';
+      try {
+        const res = await Get(Api.GetDevice + this.areaId);
+        this.deviceList = res;
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async getDicType(type) {
+      try {
+        const res = await Get(Api.DicData + type);
+        this.MonitoredTypes = res;
       } catch (e) {
         console.log(e);
       }
@@ -418,9 +469,9 @@ export default {
     async Create() {
       try {
         const res = await Post(Api.CreatePerson, this.editForm);
-          this.$message.success("操作成功");
-          this.getData();
-          this.addVisible = false;
+        this.$message.success("操作成功");
+        this.getData();
+        this.addVisible = false;
       } catch (e) {
         console.log(e);
       }
@@ -431,6 +482,17 @@ export default {
         this.$message.success("操作成功");
         this.getData();
         this.addVisible = false;
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async bind() {
+      this.bindForm.personId = this.id;
+      try {
+        const res = await Post(Api.BindDevice , this.bindForm);
+        this.$message.success("操作成功");
+        this.getData();
+        this.bindVisible = false;
       } catch (e) {
         console.log(e);
       }

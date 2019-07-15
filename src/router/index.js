@@ -42,7 +42,8 @@ export const DynamicRoutes = [
     {
         path: '*',
         redirect: '/404'
-    }
+    },
+   
 
 ]
 

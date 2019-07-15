@@ -135,6 +135,14 @@ const dynamicRoutes = [
                     title: '区域列表',
                 }
             },
+            {
+                path: 'AreaAdmin',
+                name: 'AreaAdmin',
+                component: resolve => require(['page/area-manage/AreaAdmin'], resolve),
+                meta: {
+                    title: '区域管理员',
+                }
+            },
             
         ]
     },
@@ -143,7 +151,7 @@ const dynamicRoutes = [
         component: resolve => require(['page/monitored-person-manage'], resolve),
         name: 'MonitoredPerson',
         meta: {
-            title: '监管人员管理',
+            title: '人员管理',
             icon: 'icon-xs-peoples'
         },
         children: [
@@ -153,6 +161,102 @@ const dynamicRoutes = [
                 component: resolve => require(['page/monitored-person-manage/MonitoredPersonList'], resolve),
                 meta: {
                     title: '人员列表',
+                }
+            },
+            {
+                path: 'gpsTracking',
+                name: 'gpsTracking',
+                component: resolve => require(['page/monitored-person-manage/gpsTracking'], resolve),
+                meta: {
+                    title: '行为轨迹',
+                }
+            },
+            
+        ]
+    },
+    {
+        path: '/business',
+        component: resolve => require(['page/business-manage'], resolve),
+        name: 'business',
+        meta: {
+            title: '业务管理',
+            icon: 'icon-xs-taiyang'
+        },
+        children: [
+            {
+                path: 'alarm',
+                name: 'alarm',
+                component: resolve => require(['page/business-manage/alarm'], resolve),
+                meta: {
+                    title: '警报',
+                }
+            },
+            {
+                path: 'leave',
+                name: 'leave',
+                component: resolve => require(['page/business-manage/leave'], resolve),
+                meta: {
+                    title: '请假管理',
+                }
+            },
+            {
+                path: 'InterviewRecord',
+                name: 'InterviewRecord',
+                component: resolve => require(['page/business-manage/InterviewRecord'], resolve),
+                meta: {
+                    title: '面谈记录',
+                }
+            },
+            {
+                path: 'StudyRecord',
+                name: 'xyStudyRecord',
+                component: resolve => require(['page/business-manage/StudyRecord'], resolve),
+                meta: {
+                    title: '教育学习',
+                }
+            },
+            {
+                path: 'ServiceRecord',
+                name: 'xyServiceRecord',
+                component: resolve => require(['page/business-manage/ServiceRecord'], resolve),
+                meta: {
+                    title: '社区服务',
+                }
+            },
+            
+        ]
+    },
+    {
+        path: '/geoFence',
+        component: resolve => require(['page/geoFence-manage'], resolve),
+        name: 'geoFence',
+        meta: {
+            title: '地理围栏管理',
+            icon: 'icon-xs-liebiao'
+        },
+        children: [
+            // {
+            //     path: 'fencing',
+            //     name: 'fencing',
+            //     component: resolve => require(['page/geoFence-manage/fencing'], resolve),
+            //     meta: {
+            //         title: '创建围栏',
+            //     }
+            // },
+            {
+                path: 'editfencing',
+                name: 'editfencing',
+                component: resolve => require(['page/geoFence-manage/editfencing'], resolve),
+                meta: {
+                    title: '创建围栏',
+                }
+            },
+            {
+                path: 'listItem',
+                name: 'listItem',
+                component: resolve => require(['page/geoFence-manage/list-item'], resolve),
+                meta: {
+                    title: '围栏列表',
                 }
             },
             

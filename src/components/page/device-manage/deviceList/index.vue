@@ -72,7 +72,13 @@
                 </span>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item>
-                    <p @click="handleEdit('修改')">修改</p>
+                    <p @click="handleEdit('修改')">修改设备</p>
+                  </el-dropdown-item>
+                   <el-dropdown-item>
+                    <p @click="handleConfig()">修改配置</p>
+                  </el-dropdown-item>
+                  <el-dropdown-item v-show="!scope.row.active">
+                    <p @click="handleActive()">激活</p>
                   </el-dropdown-item>
                   <el-dropdown-item>
                     <p @click="handleDelete(scope.$index, scope.row)">删除</p>
@@ -107,7 +113,7 @@
       </div>
     </div>
     <!-- 添加、编辑弹出框 -->
-    <el-dialog :title="titleT" :visible.sync="addVisible" width="600px">
+    <el-dialog :title="titleT" :visible.sync="addVisible" :close-on-click-modal="false" width="600px">
       <el-form ref="creatOrEditForm" :model="editForm" :rules="rules">
         <el-form-item label="设备串号" prop="serialNo">
           <el-input v-model="editForm.serialNo"></el-input>
@@ -135,6 +141,40 @@
         <el-button type="primary" @click="CreateOrUpdateDicData('creatOrEditForm')">确 定</el-button>
       </span>
     </el-dialog>
+    <el-dialog title="修改配置" :visible.sync="configVisible" width="600px">
+      <el-form ref="configForm" :model="configForm" :rules="rules">
+        <el-form-item label="应急电话1" prop="yj1">
+          <el-input v-model="configForm.yj1"></el-input>
+        </el-form-item>
+        <el-form-item label="应急电话2" prop="yj2">
+          <el-input v-model="configForm.yj2"></el-input>
+        </el-form-item>
+        <el-form-item label="监听电话" prop="jt">
+          <el-input v-model="configForm.jt"></el-input>
+        </el-form-item>
+        <el-form-item label="最低报警电量: % (1~100)" prop="bj">
+          <el-input v-model="configForm.bj"></el-input>
+        </el-form-item>
+        <!-- <el-form-item label="区域" prop="area">
+          <el-select class="seldialogn" v-model="editForm.area">
+            <el-option v-for="item in areas" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-switch v-model="editForm.allowConnect" active-text="允许连接"></el-switch>
+        </el-form-item>
+        <el-form-item label="电话号码" prop="phoneNumbers">
+          <el-input v-model="editForm.phoneNumbers"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="emailAddresses">
+          <el-input v-model="editForm.emailAddresses"></el-input>
+        </el-form-item> -->
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="configVisible = false">取 消</el-button>
+        <el-button type="primary" @click="CreateOrUpdateDicData('configForm')">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -151,6 +191,7 @@ export default {
       cur_page: 1,
       totalCount: 0,
       addVisible: false,
+      configVisible: false,
       ruleForm: {
         filter: "",
         area: "",
@@ -168,6 +209,12 @@ export default {
         allowConnect: true,
         phoneNumbers: "",
         emailAddresses: ""
+      },
+      configForm:{
+        yj1:"",
+        yj2:"",
+        jt:"",
+        bj:"",
       },
       deviceStatus: [
         { value: 1, displayText: "未绑定" },
@@ -253,6 +300,30 @@ export default {
         console.log(e);
       }
     },
+    handleConfig(){
+      this.configVisible = true;
+    },
+    handleActive() {
+      this.$confirm("确认激活该设备？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.ActiveDevice();
+        })
+        .catch(() => {});
+    },
+    async ActiveDevice() {
+      try {
+        const res = await Put(Api.ActiveDevice + this.id);
+        this.$message.success("激活成功");
+        this.getData();
+      } catch (e) {
+        // this.$message.error("删除失败");
+        console.log(e);
+      }
+    },
     // 点击删除
     handleDelete(index, row) {
       this.$confirm("该条数据将被删除", "提示", {
@@ -291,9 +362,7 @@ export default {
     async GetAllArea() {
       try {
         const res = await Get(Api.GetAllArea, {});
-        if (res.length !== 0) {
-          this.areas = res;
-        }
+        this.areas = res;
       } catch (e) {
         console.log(e);
       }
