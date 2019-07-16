@@ -1,7 +1,7 @@
 <template>
   <div class="upper">
     <div class="title">
-      <span class="big">创建地理围栏</span>
+      <span class="big">修改地理围栏参数</span>
     </div>
     <div class="notice" v-show="noticeVisible">
       <span @click="noticeClick">x</span>
@@ -20,8 +20,9 @@
         <div slot="header" class="clearfix">
           <span>围栏属性</span>
         </div>
-        <el-form label-position="top" label-width="120px" :model="form">
-          <el-form-item label="选择区域">
+        <!-- 添加 -->
+        <el-form label-position="top" label-width="120px" :model="form" >
+          <el-form-item label="选择区域" v-show="!id">
             <el-select
               style="width:100%"
               v-model="areaId"
@@ -32,10 +33,8 @@
               <el-option v-for="item in areas" :key="item.id" :label="item.name" :value="item.id"></el-option>
             </el-select>
           </el-form-item>
-
-          <el-form-item label="监控对象(必选)">
-            <!-- <el-input v-model="form.entityName"></el-input> -->
-            <el-select style="width:100%" v-model="form.entityName" placeholder="请选择监控对象" clearable>
+          <el-form-item label="监控对象(必选)" v-show="!id">
+            <el-select style="width:100%"  v-model="form.entityName" placeholder="请选择监控对象" clearable>
               <el-option
                 v-for="item in personList"
                 :key="item.deviceNo"
@@ -44,15 +43,19 @@
               ></el-option>
             </el-select>
           </el-form-item>
+           <el-form-item label="监控对象" v-show="id">
+            <el-input v-model="form.entityName" disabled></el-input>
+          </el-form-item>
           <el-form-item label="围栏名称(必填)">
             <el-input v-model="form.name"></el-input>
           </el-form-item>
           <el-form-item label="围栏类型(必填)">
             <el-select
+              :disabled="id ? true: false"
               v-model="form.fenceType"
               filterable
               placeholder="请选择"
-              @change="changePageControl"
+              @change="changePageControl(form.fenceType)"
               style="width:100%"
             >
               <el-option
@@ -70,21 +73,22 @@
             <el-input v-model="form.radius" placeholder="0-5000米" disabled></el-input>
           </el-form-item>
           <el-form-item label="行政区域" v-show="form.fenceType==4">
-            <el-input v-model="form.district" @keyup.enter.native="getBoundary"></el-input>
+            <el-input v-model="form.district" @keyup.enter.native="getBoundary(form.district)"></el-input>
           </el-form-item>
           <el-form-item label="偏移距离" v-show="form.fenceType==3">
             <el-input-number v-model="form.offset" :min="0" label></el-input-number>
           </el-form-item>
-
           <el-form-item label="围栏去噪参数">
             <el-input v-model="form.denoise"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="danger" @click="save">保存</el-button>
+            <el-button type="danger" @click="save(form)">保存</el-button>
             <el-button type="success" @click="clearAll">清空&重画</el-button>
-            <el-button type="primary" @click="goBack">返回</el-button>
+            <el-button type="primary"  v-show="id" @click="goBack">返回</el-button>
           </el-form-item>
         </el-form>
+       
+       
       </el-card>
     </el-col>
   </div>
@@ -114,9 +118,6 @@ export default {
         denoise: "0", //去噪参数
         entityName: "", //监控对象
         fenceType: "", //围栏形状
-        // lat: null,
-        // lng: null,
-        // radius: null,
         name: "", //围栏名称
         district: "", //行政区域
         vertexes: "", //线形数据
@@ -124,26 +125,27 @@ export default {
       },
       options: [
         {
-          value: "0",
+          value: 0,
           label: "请选择"
         },
         {
-          value: "1",
+          value: 1,
           label: "圆形围栏"
         },
         {
-          value: "2",
+          value: 2,
           label: "多边形围栏"
         },
         {
-          value: "3",
+          value: 3,
           label: "线形围栏"
         },
         {
-          value: "4",
+          value: 4,
           label: "行政区域围栏"
         }
       ],
+      id: "",
       areas: [],
       personList: [],
       noticeVisible: true
@@ -153,10 +155,11 @@ export default {
     this.initMap();
   },
   created() {
-    //   this.drawingOverlayEdit(this.form);
+    this.id = this.$route.params.id;
+    if (this.id) {
+      this.GetFenceDetails();
+    }
     this.GetAllArea();
-
-    console.log(this.form);
   },
   updated() {
     //添加鼠标绘制工具监听事件，用于获取绘制结果
@@ -172,7 +175,8 @@ export default {
       } else {
         return this.form.lng + "," + this.form.lat;
       }
-    }
+    },
+ 
   },
   watch: {},
   methods: {
@@ -191,6 +195,53 @@ export default {
         this.personList = res;
       } catch (e) {
         console.log(e);
+      }
+    },
+    async GetFenceDetails() {
+      try {
+        const res = await Get(Api.Fence + this.id);
+        this.form = res;
+        this.changePageControl(this.form.fenceType);
+        this.drawingOverlayEdit(this.form);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    //编辑模式的时候画图
+    drawingOverlayEdit(data) {
+      var overlay;
+      if (data.fenceType == 1) {
+        overlay = new BMap.Circle(
+          new BMap.Point(data.lng, data.lat),
+          data.radius,
+          this.styleOptions
+        );
+      } else if (data.fenceType == 2) {
+        var path = [];
+        var pointsArray = data.vertexes.split(";");
+        for (var i = 0; i < pointsArray.length; i++) {
+          var point = pointsArray[i].split(",");
+          path.push(new BMap.Point(point[1], point[0]));
+        }
+        overlay = new BMap.Polygon(path, this.styleOptions);
+      } else if (data.fenceType == 3) {
+        var path = [];
+        var pointsArray = data.vertexes.split(";");
+        for (var i = 0; i < pointsArray.length; i++) {
+          var point = pointsArray[i].split(",");
+          path.push(new BMap.Point(point[1],point[0]));
+        }
+        overlay = new BMap.Polyline(path, this.styleOptions);
+      } else if (data.fenceType == 4) {
+        this.getBoundary(data.district);
+      }
+      if (overlay && data.fenceType != 4) {
+        this.maps.clearOverlays();
+        this.maps.addOverlay(overlay);
+        this.overlays.push(overlay);
+        this.currentOverlay = overlay;
+        overlay.enableEditing();
+        this.maps.setViewport(overlay.getPath());
       }
     },
 
@@ -216,9 +267,8 @@ export default {
       });
     },
     //检索行政区域
-    getBoundary() {
+    getBoundary(dictrict) {
       var bdary = new BMap.Boundary();
-      var dictrict = this.form.district;
       if (dictrict) {
         bdary.get(dictrict, rs => {
           //获取行政区域
@@ -248,18 +298,18 @@ export default {
       }
       this.overlays.length = 0;
     },
-    changePageControl() {
+    changePageControl(fenceType) {
       this.clearAll();
-      switch (this.form.fenceType) {
-        case "1":
+      switch (fenceType) {
+        case 1:
           this.drawingManager.setDrawingMode(BMAP_DRAWING_CIRCLE);
           this.drawingManager.open();
           break;
-        case "2":
+        case 2:
           this.drawingManager.setDrawingMode(BMAP_DRAWING_POLYGON);
           this.drawingManager.open();
           break;
-        case "3":
+        case 3:
           this.drawingManager.setDrawingMode(BMAP_DRAWING_POLYLINE);
           this.drawingManager.open();
           break;
@@ -267,8 +317,8 @@ export default {
           break;
       }
     },
-    save() {
-      let fenceObj = this.form;
+    save(fenceObj) {
+      // let fenceObj = this.form;
       let currentOverlay = this.currentOverlay;
       if (!fenceObj.name) {
         this.$message.warning("请输入围栏名称");
@@ -276,22 +326,25 @@ export default {
       }
       if (this.currentOverlay) {
         //圆形
-        if (fenceObj.fenceType == "1") {
+        if (fenceObj.fenceType == 1) {
           fenceObj.radius = currentOverlay.getRadius();
           fenceObj.lng = currentOverlay.getCenter().lng;
           fenceObj.lat = currentOverlay.getCenter().lat;
-        } else if (fenceObj.fenceType == "2" || fenceObj.fenceType == "3") {
+        } else if (fenceObj.fenceType == 2 || fenceObj.fenceType == 3) {
           //多边形
           var path = currentOverlay.getPath();
           var vertexes = "";
           for (var i = 0; i < path.length; i++) {
-            vertexes += path[i].lng + "," + path[i].lat + ";";
+            vertexes += path[i].lat + "," + path[i].lng + ";";
           }
           vertexes = vertexes.substring(0, vertexes.length - 1);
           fenceObj.vertexes = vertexes;
         }
-        console.log(fenceObj);
-        this.CreateFence(fenceObj);
+        if (this.id) {
+          this.EditFence(fenceObj);
+        } else {
+          this.CreateFence(fenceObj);
+        }
       } else {
         this.$message.warning("未发现围栏数据，请确认您是否已经画图了？");
       }
@@ -300,15 +353,25 @@ export default {
       try {
         const res = await Post(Api.CreateFence, fence);
         if (res) {
-          this.getData();
-          this.$message("创建成功");
+          this.clearAll();
+          this.$message.success("创建成功");
         }
       } catch (e) {
         console.log(e);
       }
     },
+    async EditFence(fence) {
+      try {
+        const res = await Put(Api.Fence + this.id, fence);
+        this.$message.success("修改成功");
+        this.$router.go(-1);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+
     goBack() {
-      // this.$router.push("/vehicle/vehicles");
+      this.$router.go(-1);
     },
     overlaycomplete(e) {
       this.overlays.push(e.overlay);

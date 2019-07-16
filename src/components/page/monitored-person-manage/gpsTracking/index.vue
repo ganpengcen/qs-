@@ -100,11 +100,7 @@ export default {
       form: {
         entityName: "",
         trackDate: new Date(),
-        isProcessed: true,
-        transportMode: "",
-        needDenoise: 0,
-        needVacuate: 0,
-        mapmatch: 0
+        isProcessed: false
       },
       vehicles: [],
       vehiclesArr: [],
@@ -117,18 +113,18 @@ export default {
     };
   },
   watch: {
-    dateArr: {
-      handler(val, oldVal) {
-        if (val == null) {
-          this.ruleForm.beginTime = "";
-          this.ruleForm.endTime = "";
-        } else {
-          this.ruleForm.beginTime = val[0];
-          this.ruleForm.endTime = val[1];
-        }
-      },
-      deep: true
-    }
+    // dateArr: {
+    //   handler(val, oldVal) {
+    //     if (val == null) {
+    //       this.ruleForm.beginTime = "";
+    //       this.ruleForm.endTime = "";
+    //     } else {
+    //       this.ruleForm.beginTime = val[0];
+    //       this.ruleForm.endTime = val[1];
+    //     }
+    //   },
+    //   deep: true
+    // }
   },
   created() {
     this.hh();

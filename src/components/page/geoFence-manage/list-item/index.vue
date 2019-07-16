@@ -240,12 +240,11 @@ export default {
     },
 
     handleCreate(title) {
-     this.$router.push('/geoFence/editfencing/');
+     this.$router.push('/geoFence/fencing/');
     },
     // 跳转至编辑页面
     goToEdit() {
-      this.$router.push( { name: 'editfencing', params: { id: this.id }});
-      // this.$router.push('/geoFence/editfencing/' + this.id);
+      this.$router.push( { name: 'fencing', params: { id: this.id }});
     }
      
   }

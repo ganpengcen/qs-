@@ -164,6 +164,14 @@ const dynamicRoutes = [
                 }
             },
             {
+                path: 'location',
+                name: 'location',
+                component: resolve => require(['page/monitored-person-manage/location'], resolve),
+                meta: {
+                    title: '人员定位',
+                }
+            },
+            {
                 path: 'gpsTracking',
                 name: 'gpsTracking',
                 component: resolve => require(['page/monitored-person-manage/gpsTracking'], resolve),
@@ -235,18 +243,10 @@ const dynamicRoutes = [
             icon: 'icon-xs-liebiao'
         },
         children: [
-            // {
-            //     path: 'fencing',
-            //     name: 'fencing',
-            //     component: resolve => require(['page/geoFence-manage/fencing'], resolve),
-            //     meta: {
-            //         title: '创建围栏',
-            //     }
-            // },
             {
-                path: 'editfencing',
-                name: 'editfencing',
-                component: resolve => require(['page/geoFence-manage/editfencing'], resolve),
+                path: 'fencing',
+                name: 'fencing',
+                component: resolve => require(['page/geoFence-manage/fencing'], resolve),
                 meta: {
                     title: '创建围栏',
                 }

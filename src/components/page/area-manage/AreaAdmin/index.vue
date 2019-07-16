@@ -4,7 +4,12 @@
       <span class="big">区域管理员</span>
       <span class="small">区域管理员维护</span>
       <!-- v-has="'Pages.Foundations.DicData.Create'" -->
-      <el-button type="primary" icon="el-icon-edit" @click="handleAdd('添加区域')" class="btn">添加新区域</el-button>
+      <el-button
+        type="primary"
+        icon="el-icon-edit"
+        @click="handleAdd('添加区域管理员')"
+        class="btn"
+      >添加区域管理员</el-button>
     </div>
     <!--表格-->
     <div class="container">
@@ -15,6 +20,15 @@
           class="handle-input"
           @keyup.enter.native="getData"
         ></el-input>
+        <el-select
+          class="sel"
+          clearable
+          v-model="ruleForm.area"
+          @change="getData()"
+          placeholder="根据区域搜索"
+        >
+          <el-option v-for="item in areas" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
         <el-button type="primary" icon="search" @click="getData()">搜索</el-button>
       </div>
       <div class="tableThCol">
@@ -43,7 +57,9 @@
               </el-dropdown>
             </template>
           </el-table-column>
-          <el-table-column prop="name" label="名称" min-width="160px" sortable="custom"></el-table-column>
+          <el-table-column prop="code" label="编号" sortable="custom" min-width="140px"></el-table-column>
+          <el-table-column prop="name" label="名字" sortable="custom" min-width="140px"></el-table-column>
+          <el-table-column prop="area" label="区域" sortable="custom" min-width="140px"></el-table-column>
           <el-table-column
             prop="dateAdded"
             :formatter="formatTableDate"
@@ -66,10 +82,38 @@
     <!-- 添加、编辑弹出框 -->
     <el-dialog :title="titleT" :visible.sync="addVisible" width="600px">
       <el-form ref="creatOrEditForm" :model="editForm" :rules="rules">
-        <el-form-item label="名称" prop="name">
+        <el-form-item label="编号" prop="code">
+          <el-input v-model="editForm.code"></el-input>
+        </el-form-item>
+        <el-form-item label="姓名" prop="name">
           <el-input v-model="editForm.name"></el-input>
         </el-form-item>
+        <el-form-item prop="gender" label="性别">
+          <el-select class="seldialogn" v-model="editForm.gender" placeholder="请选择性别">
+            <el-option
+              v-for="item in genderList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="用户名" prop="userName" v-if="titleT == '添加区域管理员'">
+          <el-input v-model="editForm.userName"></el-input>
+        </el-form-item>
+        <el-form-item label="密码（至少包含一个数字，至少6个字符）" prop="password" v-if="titleT == '添加区域管理员'">
+          <el-input v-model="editForm.password"></el-input>
+        </el-form-item>
+        <el-form-item prop="areaId" label="区域">
+          <el-select class="seldialogn" v-model="editForm.areaId" placeholder="请选择区域">
+            <el-option v-for="item in areas" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="电话号码" prop="phoneNumber">
+          <el-input v-model="editForm.phoneNumber"></el-input>
+        </el-form-item>
       </el-form>
+
       <span slot="footer" class="dialog-footer">
         <el-button @click="addVisible = false">取 消</el-button>
         <el-button type="primary" @click="CreateOrUpdate('creatOrEditForm')">确 定</el-button>
@@ -85,28 +129,62 @@ import { Post, Get, Delete, Put } from "@/api/api";
 export default {
   name: "AreaAdmin",
   data() {
+    var validatePass = (rule, value, callback) => {
+      let password = this.editForm.password;
+      if (value === "" || value == null || password == undefined) {
+        callback(new Error("请输入密码"));
+      } else if (value.length < 6) {
+        callback(new Error("最少要输入6个字符"));
+      }else{
+        callback();
+      }
+    };
+
     return {
       titleT: "",
       tableData: [],
       cur_page: 1,
       totalCount: 0,
       addVisible: false,
+      areas: [],
+      genderList: [
+        {
+          id: 1,
+          name: "男"
+        },
+        {
+          id: 0,
+          name: "女"
+        }
+      ],
       ruleForm: {
         filter: "",
+        area: "",
         sorting: "DateAdded desc",
         maxResultCount: 10,
         skipCount: 0
       },
       id: "",
       editForm: {
-        name: ""
+        code: "",
+        userName: "",
+        password: "",
+        name: "",
+        gender: 1,
+        areaId: "",
+        phoneNumber: ""
       },
       rules: {
-        name: [{ required: true, message: "必填", trigger: "blur" }]
+        areaId: [{ required: true, message: "请选择", trigger: "change" }],
+        code: [{ required: true, message: "必填", trigger: "blur" }],
+        name: [{ required: true, message: "必填", trigger: "blur" }],
+        password: [{ validator: validatePass, trigger: "blur" }],
+        userName: [{ required: true, message: "必填", trigger: "blur" }]
       }
     };
   },
   created() {
+    this.GetAllArea();
     this.getData();
   },
   computed: {
@@ -146,10 +224,18 @@ export default {
       this.ruleForm.maxResultCount = val;
       this.getData();
     },
+    async GetAllArea() {
+      try {
+        const res = await Get(Api.GetAllArea, {});
+        this.areas = res;
+      } catch (e) {
+        console.log(e);
+      }
+    },
     CreateOrUpdate(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          if (this.titleT == "添加区域") {
+          if (this.titleT == "添加区域管理员") {
             this.Create();
           } else {
             this.Update();
@@ -165,7 +251,7 @@ export default {
       this.ruleForm.skipCount =
         (this.cur_page - 1) * this.ruleForm.maxResultCount;
       try {
-        const res = await Post(Api.GetAreaList, this.ruleForm);
+        const res = await Post(Api.GetAreaAdminList, this.ruleForm);
         if (res) {
           this.tableData = res.items;
           this.totalCount = res.totalCount;
@@ -188,7 +274,7 @@ export default {
     },
     async delTemplateMsg() {
       try {
-        const res = await Delete(Api.Area + this.id);
+        const res = await Delete(Api.AreaAdmin + this.id);
         this.$message.success("删除成功");
         this.getData();
       } catch (e) {
@@ -200,7 +286,7 @@ export default {
       this.addVisible = true;
       this.titleT = title;
       try {
-        const res = await Get(Api.Area + this.id);
+        const res = await Get(Api.AreaAdmin + this.id);
         if (res) {
           this.editForm = res;
         }
@@ -216,7 +302,7 @@ export default {
     },
     async Create() {
       try {
-        const res = await Post(Api.CreateArea, this.editForm);
+        const res = await Post(Api.CreateAreaAdmin, this.editForm);
         this.$message.success("操作成功");
         this.getData();
         this.addVisible = false;
@@ -226,14 +312,14 @@ export default {
     },
     async Update() {
       try {
-        const res = await Put(Api.Area + this.id, this.editForm);
+        const res = await Put(Api.AreaAdmin + this.id, this.editForm);
         this.$message.success("操作成功");
         this.getData();
         this.addVisible = false;
       } catch (e) {
         console.log(e);
       }
-    },
+    }
   }
 };
 </script>

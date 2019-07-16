@@ -78,6 +78,11 @@ export default {
 	GetAllArea:'/api/area/all',
 	CreateArea:'/api/area',
 	Area:'/api/area/',
+	
+	//----------------------------区域管理员---------------------------------
+	GetAreaAdminList:'/api/areaAdmin/list',
+	CreateAreaAdmin:'/api/areaAdmin',
+	AreaAdmin:'/api/areaAdmin/',
 
 	//----------------------------围栏管理-----------------------------------
 	GetFenceList:'/api/fence/list',
@@ -85,8 +90,8 @@ export default {
 	Fence:'/api/fence/',
 
 	//----------------------------轨迹-----------------------------------
-	
 	TrackingLine:'/api/tracking/line',
+	TrackingTime:'/api/tracking/time',
 
 	//----------------------------监管人员管理-----------------------------------
 	GetPersonList:'/api/person/list',

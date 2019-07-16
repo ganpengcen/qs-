@@ -75,12 +75,18 @@
                     <p @click="handleEdit('修改')">修改设备</p>
                   </el-dropdown-item>
                    <el-dropdown-item>
-                    <p @click="handleConfig()">修改配置</p>
+                    <p @click="handleConfig()">配置参数</p>
                   </el-dropdown-item>
-                  <el-dropdown-item v-show="!scope.row.active">
+                  <el-dropdown-item v-show="!scope.row.active" divided>
                     <p @click="handleActive()">激活</p>
                   </el-dropdown-item>
                   <el-dropdown-item>
+                    <p>关机</p>
+                  </el-dropdown-item>
+                  <el-dropdown-item>
+                    <p>重启</p>
+                  </el-dropdown-item>
+                  <el-dropdown-item divided>
                     <p @click="handleDelete(scope.$index, scope.row)">删除</p>
                   </el-dropdown-item>
                 </el-dropdown-menu>
@@ -90,8 +96,16 @@
           <el-table-column prop="serialNo" label="设备串号" min-width="160px" sortable="custom"></el-table-column>
           <el-table-column prop="businessNo" label="业务编号" min-width="160px" sortable="custom"></el-table-column>
           <el-table-column prop="area" label="区域" min-width="120px" sortable="custom"></el-table-column>
-          <el-table-column :formatter="isactive" prop="active" label="是否激活"  min-width="100px" sortable="custom"></el-table-column>
-          <el-table-column :formatter="isdevice" prop="deviceStatus" label="绑定状态" min-width="100px" sortable="custom"></el-table-column>
+          <el-table-column prop="active" label="是否激活"  min-width="100px" sortable="custom">
+            <template slot-scope="scope">
+              <p :class="[{'text-danger':!scope.row.active},{'text-safe':scope.row.active}]">{{scope.row.active?'已激活':'未激活'}}</p>
+            </template>
+          </el-table-column>
+          <el-table-column  prop="deviceStatus" label="绑定状态" min-width="100px" sortable="custom">
+            <template slot-scope="scope">
+             <p :class="[{'text-danger':scope.row.deviceStatus == 3},{'text-safe':scope.row.deviceStatus == 2}]">{{scope.row.deviceStatus == 1?'未绑定':scope.row.deviceStatus == 2?'已绑定':'错误'}}</p>
+            </template>
+          </el-table-column>
           <el-table-column :formatter="isonline" prop="onlineStatus" label="在线状态" min-width="100px" sortable="custom"></el-table-column>         
           <el-table-column
             prop="dueDate"
@@ -141,7 +155,7 @@
         <el-button type="primary" @click="CreateOrUpdateDicData('creatOrEditForm')">确 定</el-button>
       </span>
     </el-dialog>
-    <el-dialog title="修改配置" :visible.sync="configVisible" width="600px">
+    <el-dialog title="配置参数" :visible.sync="configVisible" width="600px">
       <el-form ref="configForm" :model="configForm" :rules="rules">
         <el-form-item label="应急电话1" prop="yj1">
           <el-input v-model="configForm.yj1"></el-input>
@@ -155,20 +169,24 @@
         <el-form-item label="最低报警电量: % (1~100)" prop="bj">
           <el-input v-model="configForm.bj"></el-input>
         </el-form-item>
-        <!-- <el-form-item label="区域" prop="area">
-          <el-select class="seldialogn" v-model="editForm.area">
-            <el-option v-for="item in areas" :key="item.id" :label="item.name" :value="item.id"></el-option>
-          </el-select>
+        <el-form-item label="终端上传数据间隔时间: (分钟)" prop="sj">
+          <el-input v-model="configForm.sj"></el-input>
         </el-form-item>
-        <el-form-item>
-          <el-switch v-model="editForm.allowConnect" active-text="允许连接"></el-switch>
+        <el-form-item label="语言" prop="language">
+          <el-radio v-model="configForm.language" label="1">英文</el-radio>
+          <el-radio v-model="configForm.language" label="2">中文</el-radio>
         </el-form-item>
-        <el-form-item label="电话号码" prop="phoneNumbers">
-          <el-input v-model="editForm.phoneNumbers"></el-input>
+        <el-form-item label="数据发送模式" prop="sendmode">
+          <el-radio v-model="configForm.sendmode" label="1">socket</el-radio>
+          <el-radio v-model="configForm.sendmode" label="2">sms</el-radio>
         </el-form-item>
-        <el-form-item label="邮箱" prop="emailAddresses">
-          <el-input v-model="editForm.emailAddresses"></el-input>
-        </el-form-item> -->
+        <el-form-item label="终端连接模式" prop="linkmode">
+          <el-radio v-model="configForm.linkmode" label="1">短连接</el-radio>
+          <el-radio v-model="configForm.linkmode" label="2">长连接</el-radio>
+        </el-form-item>
+        <el-form-item label="关机密码" prop="psw">
+          <el-input v-model="configForm.psw"></el-input>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="configVisible = false">取 消</el-button>
@@ -215,6 +233,12 @@ export default {
         yj2:"",
         jt:"",
         bj:"",
+        sj:"",
+        language:"1",
+        sendmode:"1",
+        linkmode:"1",
+        psw:""
+
       },
       deviceStatus: [
         { value: 1, displayText: "未绑定" },
@@ -395,15 +419,10 @@ export default {
         console.log(e);
       }
     },
-    isactive(data) {
-      return data.active ? "已激活" : "未激活";
-    },
     isonline(data) {
       return data.onlineStatus == 1 ? "在线" : "离线";
     },
-    isdevice(data) {
-      return data.deviceStatus == 1 ? "未绑定" : data.deviceStatus == 2 ? "已绑定" : "错误";
-    },
+   
   }
 };
 </script>

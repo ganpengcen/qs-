@@ -45,11 +45,14 @@
                   <el-dropdown-item>
                     <p @click="handleEdit('修改')">修改</p>
                   </el-dropdown-item>
-                  <el-dropdown-item>
+                  <el-dropdown-item v-show="!scope.row.isBinded">
                     <p @click="bindVisible = true">绑定</p>
                   </el-dropdown-item>
-                  <el-dropdown-item>
+                  <el-dropdown-item v-show="scope.row.isBinded">
                     <p @click="Unbind()">解绑</p>
+                  </el-dropdown-item>
+                  <el-dropdown-item v-show="scope.row.isBinded">
+                    <p @click="handleMap(scope.row.deviceNo)">创建围栏</p>
                   </el-dropdown-item>
                   <el-dropdown-item>
                     <p @click="handleDelete(scope.$index, scope.row)">删除</p>
@@ -58,6 +61,11 @@
               </el-dropdown>
             </template>
           </el-table-column>
+          <el-table-column  prop="isBinded" label="是否绑定"  min-width="100px" sortable="custom">
+              <template slot-scope="scope">
+               <p :class="[{'text-danger':!scope.row.isBinded},{'text-safe':scope.row.isBinded}]">{{scope.row.isBinded?'已绑定':'未绑定'}}</p>
+            </template>
+          </el-table-column>          
           <el-table-column prop="areaName" label="区域" min-width="120px" sortable="custom"></el-table-column>
           <el-table-column prop="name" label="姓名" min-width="120px" sortable="custom"></el-table-column>
           <el-table-column prop="gender" label="性别" sortable="custom"></el-table-column>
@@ -186,8 +194,13 @@
           </el-select>
         </el-form-item>
         <el-form-item prop="serialNo" label="选择设备" v-if="areaId != ''">
-          <el-select class="seldialogn"  v-model="bindForm.serialNo" placeholder="请选择">
-            <el-option v-for="item in deviceList" :key="item.serialNo" :label="item.serialNo" :value="item.serialNo"></el-option>
+          <el-select class="seldialogn" v-model="bindForm.serialNo" placeholder="请选择">
+            <el-option
+              v-for="item in deviceList"
+              :key="item.serialNo"
+              :label="item.serialNo"
+              :value="item.serialNo"
+            ></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -196,6 +209,40 @@
         <el-button type="primary" @click="BindDevice('bindForm')">确 定</el-button>
       </span>
     </el-dialog>
+
+    <div class="geoFence" v-show="geoFenceVisible">
+      <div class="el-dialog">
+        <div class="geoform">
+        <p>创建围栏</p>
+        <el-form  :inline="true"  class="demo-form-inline" :model="form">
+          <el-form-item label="围栏名称(必填)">
+            <el-input  v-model="form.name"></el-input>
+          </el-form-item>
+          <el-form-item label="圆心坐标" v-show="form.fenceType==1">
+            <el-input v-model="coordinate" disabled></el-input>
+          </el-form-item>
+          <el-form-item label="围栏半径" v-show="form.fenceType==1">
+            <el-input  v-model="form.radius" placeholder="0-5000米" disabled></el-input>
+          </el-form-item>
+           <el-form-item label="偏移距离" v-show="form.fenceType==3">
+            <el-input-number v-model="form.offset" :min="0" label></el-input-number>
+          </el-form-item>
+          <el-form-item label="围栏去噪参数">
+            <el-input  v-model="form.denoise"></el-input>
+          </el-form-item>
+        </el-form>
+        </div>
+      
+        <div id="allmap" ref="allmap" style="height:600px"></div>
+        <div class="el-dialog__footer">
+          <span slot="footer" class="dialog-footer">
+            <el-button type="danger" @click="save(form)">保存</el-button>
+            <el-button type="success" @click="clearAll">清空&重画</el-button>
+            <el-button @click="geoFenceVisible = false">取 消</el-button>
+          </span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -209,11 +256,33 @@ export default {
   data() {
     return {
       titleT: "",
+      maps: {},
+      form: {
+        denoise: "0", //去噪参数
+        entityName: "", //监控对象
+        fenceType: "", //围栏形状
+        name: "", //围栏名称
+        district: "", //行政区域
+        vertexes: "", //线形数据
+        offset: "" //偏移距离
+      },
+      drawingManager: {}, //鼠标绘制工具
+      currentOverlay: {},
+      styleOptions: {
+        strokeColor: "red", //边线颜色。
+        fillColor: "red", //填充颜色。当参数为空时，圆形将没有填充效果。
+        strokeWeight: 3, //边线的宽度，以像素为单位。
+        strokeOpacity: 0.6, //边线透明度，取值范围0 - 1。
+        fillOpacity: 0.5, //填充的透明度，取值范围0 - 1。
+        strokeStyle: "solid" //边线的样式，solid或dashed。
+      },
+      overlays: [],
       tableData: [],
       cur_page: 1,
       totalCount: 0,
       addVisible: false,
       bindVisible: false,
+      geoFenceVisible: false,
       pickerOptions2: DatePicker,
       ruleForm: {
         filter: "",
@@ -254,9 +323,9 @@ export default {
         serialNo: "",
         personId: ""
       },
-      areaId:"",
+      areaId: "",
       MonitoredTypes: [],
-      deviceList:[],
+      deviceList: [],
       types: [
         { value: 1, displayText: "未绑定" },
         { value: 2, displayText: "已绑定" },
@@ -275,11 +344,14 @@ export default {
         beginDate: [{ required: true, message: "请选择", trigger: "change" }],
         endDate: [{ required: true, message: "请选择", trigger: "change" }]
       },
-      bindRules:{
-        serialNo: [{ required: true, message: "请选择", trigger: "change" }],
+      bindRules: {
+        serialNo: [{ required: true, message: "请选择", trigger: "change" }]
       }
+    
     };
   },
+  mounted() {},
+  updated() {},
   created() {
     this.getDicType(1);
     this.GetAllArea();
@@ -292,7 +364,14 @@ export default {
   computed: {
     data() {
       return this.tableData;
-    }
+    },
+     coordinate() {
+      if (!(this.form.lng && this.form.lat)) {
+        return null;
+      } else {
+        return this.form.lng + "," + this.form.lat;
+      }
+    },
   },
   watch: {
     cur_page(curVal, oldVal) {
@@ -315,9 +394,207 @@ export default {
       if (!curVal) {
         this.$resetForm(this.$refs["creatOrEditForm"]);
       }
+    },
+    geoFenceVisible(curVal) {
+      if (curVal) {
+        this.initMap();
+        //添加鼠标绘制工具监听事件，用于获取绘制结果
+        this.drawingManager.addEventListener(
+          "overlaycomplete",
+          this.overlaycomplete
+        );
+      }
     }
   },
   methods: {
+    //编辑模式的时候画图
+    drawingOverlayEdit(data) {
+      var overlay;
+      if (data.fenceType == 1) {
+        overlay = new BMap.Circle(
+          new BMap.Point(data.lng, data.lat),
+          data.radius,
+          this.styleOptions
+        );
+      } else if (data.fenceType == 2) {
+        var path = [];
+        var pointsArray = data.vertexes.split(";");
+        for (var i = 0; i < pointsArray.length; i++) {
+          var point = pointsArray[i].split(",");
+          path.push(new BMap.Point(point[1], point[0]));
+        }
+        overlay = new BMap.Polygon(path, this.styleOptions);
+      } else if (data.fenceType == 3) {
+        var path = [];
+        var pointsArray = data.vertexes.split(";");
+        for (var i = 0; i < pointsArray.length; i++) {
+          var point = pointsArray[i].split(",");
+          path.push(new BMap.Point(point[0], point[1]));
+        }
+        overlay = new BMap.Polyline(path, this.styleOptions);
+      } else if (data.fenceType == 4) {
+        this.getBoundary(data.district);
+      }
+      if (overlay && data.fenceType != 4) {
+        this.maps.clearOverlays();
+        this.maps.addOverlay(overlay);
+        this.overlays.push(overlay);
+        this.currentOverlay = overlay;
+        overlay.enableEditing();
+        this.maps.setViewport(overlay.getPath());
+      }
+    },
+    initMap() {
+      var map = new BMap.Map(this.$refs.allmap); // 创建Map实例
+      this.maps = map;
+      map.addControl(new BMap.NavigationControl());
+      var point = new BMap.Point(120.302717, 31.58251);
+      map.centerAndZoom(point, 16);
+      map.enableScrollWheelZoom(); //启用滚轮放大缩小
+      //实例化鼠标绘制工具
+      this.drawingManager = new BMapLib.DrawingManager(map, {
+        isOpen: false, //是否开启绘制模式
+        enableDrawingTool: true, //是否显示工具栏
+        drawingToolOptions: {
+          anchor: BMAP_ANCHOR_TOP_RIGHT, //位置
+          offset: new BMap.Size(5, 5), //偏离值
+          drawingModes: ["circle", "polygon", "polyline"]
+        },
+        circleOptions: this.styleOptions, //圆的样式
+        polylineOptions: this.styleOptions, //线的样式
+        polygonOptions: this.styleOptions //多边形的样式
+      });
+    },
+    //检索行政区域
+    getBoundary(dictrict) {
+      var bdary = new BMap.Boundary();
+      if (dictrict) {
+        bdary.get(dictrict, rs => {
+          //获取行政区域
+          this.maps.clearOverlays(); //清除地图覆盖物
+          var count = rs.boundaries.length; //行政区域的点有多少个
+          if (count === 0) {
+            this.$message.error("未能获取当前输入行政区域");
+            return;
+          } else if (count > 1) {
+            this.$message.warning("您所检索的行政区域大于1个，请更换关键字");
+            return;
+          }
+          var pointArray = [];
+          var ply = new BMap.Polygon(rs.boundaries[0], this.styleOptions); //建立多边形覆盖物
+          this.maps.addOverlay(ply); //添加覆盖物
+          this.overlays.push(ply);
+          this.currentOverlay = ply;
+          pointArray = pointArray.concat(ply.getPath());
+          this.maps.setViewport(pointArray); //调整视野
+        });
+      }
+    },
+    // 清空
+    clearAll() {
+      for (var i = 0; i < this.overlays.length; i++) {
+        this.maps.removeOverlay(this.overlays[i]);
+      }
+      this.overlays.length = 0;
+      this.form.fenceType = "";
+    },
+    changePageControl(fenceType) {
+      this.clearAll();
+      switch (fenceType) {
+        case 1:
+          this.drawingManager.setDrawingMode(BMAP_DRAWING_CIRCLE);
+          this.drawingManager.open();
+          break;
+        case 2:
+          this.drawingManager.setDrawingMode(BMAP_DRAWING_POLYGON);
+          this.drawingManager.open();
+          break;
+        case 3:
+          this.drawingManager.setDrawingMode(BMAP_DRAWING_POLYLINE);
+          this.drawingManager.open();
+          break;
+        default:
+          break;
+      }
+    },
+    save(fenceObj) {
+      let currentOverlay = this.currentOverlay;
+      if (!fenceObj.name) {
+        this.$message.warning("请输入围栏名称");
+        return;
+      }
+      if (this.currentOverlay) {
+        //圆形
+        if (fenceObj.fenceType == 1) {
+          fenceObj.radius = currentOverlay.getRadius();
+          fenceObj.lng = currentOverlay.getCenter().lng;
+          fenceObj.lat = currentOverlay.getCenter().lat;
+        } else if (fenceObj.fenceType == 2 || fenceObj.fenceType == 3) {
+          //多边形
+          var path = currentOverlay.getPath();
+          var vertexes = "";
+          for (var i = 0; i < path.length; i++) {
+            vertexes += path[i].lat + "," + path[i].lng + ";";
+          }
+          vertexes = vertexes.substring(0, vertexes.length - 1);
+          fenceObj.vertexes = vertexes;
+        }  
+          this.CreateFence(fenceObj);       
+      } else {
+        this.$message.warning("未发现围栏数据，请确认您是否已经画图了？");
+      }
+    },
+    async CreateFence(fence) {
+      try {
+        const res = await Post(Api.CreateFence, fence);
+        if (res) {
+          this.getData();
+          this.$message.success("创建成功");
+          this.geoFenceVisible = false;
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    overlaycomplete(e) {
+      switch (e.drawingMode) {
+        case "circle":
+          this.form.fenceType = 1;
+          break;
+        case "polygon":
+          this.form.fenceType = 2;
+          break;
+        case "polyline":
+          this.form.fenceType = 3;
+          break;
+        default:
+          break;
+      }
+      this.overlays.push(e.overlay);
+      this.currentOverlay = e.overlay;
+      e.overlay.enableEditing();
+      this.drawingManager.close();
+      //根据不同类型的图形设置页面的控件内容
+      this.setControlContent();
+    },
+    //画图完之后获取图形对象
+    setControlContent() {
+      var drawingMode = this.drawingManager.getDrawingMode();
+      if (this.currentOverlay) {
+        //设置圆形的圆心坐标和半径的值
+        if (drawingMode == BMAP_DRAWING_CIRCLE) {
+          var circlePoint = this.currentOverlay.getCenter();
+          var radius = this.currentOverlay.getRadius();
+          this.$set(this.form, "radius", radius);
+          this.$set(this.form, "lng", circlePoint.lng);
+          this.$set(this.form, "lat", circlePoint.lat);
+
+          this.$set(this.editForm, "radius", radius);
+          this.$set(this.editForm, "lng", circlePoint.lng);
+          this.$set(this.editForm, "lat", circlePoint.lat);
+        }
+      }
+    },
     // 表格排序
     sortChange: function(column) {
       if (column.order == null) {
@@ -355,11 +632,11 @@ export default {
     BindDevice(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-         if (this.areaId == '') {
-           this.$message.warning('请选择区域');
-           return;
-         }
-         this.bind();
+          if (this.areaId == "") {
+            this.$message.warning("请选择区域");
+            return;
+          }
+          this.bind();
         } else {
           console.log("error submit!!");
           return false;
@@ -402,7 +679,7 @@ export default {
         console.log(e);
       }
     },
-    Unbind(){
+    Unbind() {
       this.$confirm("确定对该人员设备进行解绑操作？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -413,7 +690,7 @@ export default {
         })
         .catch(() => {});
     },
-     async unbindPerson() {
+    async unbindPerson() {
       try {
         const res = await Put(Api.Unbind + this.id);
         this.$message.success("解绑成功");
@@ -421,6 +698,10 @@ export default {
       } catch (e) {
         console.log(e);
       }
+    },
+    handleMap(deviceNo) {
+      this.geoFenceVisible = true;
+      this.form.entityName = deviceNo;
     },
     // 获取编辑页面
     async handleEdit(title) {
@@ -444,7 +725,7 @@ export default {
       }
     },
     async GetDevice() {
-      this.bindForm.serialNo = '';
+      this.bindForm.serialNo = "";
       try {
         const res = await Get(Api.GetDevice + this.areaId);
         this.deviceList = res;
@@ -489,7 +770,7 @@ export default {
     async bind() {
       this.bindForm.personId = this.id;
       try {
-        const res = await Post(Api.BindDevice , this.bindForm);
+        const res = await Post(Api.BindDevice, this.bindForm);
         this.$message.success("操作成功");
         this.getData();
         this.bindVisible = false;
@@ -497,12 +778,7 @@ export default {
         console.log(e);
       }
     },
-    isactive(data) {
-      return data.active ? "已激活" : "未激活";
-    },
-    isonline(data) {
-      return data.onlineStatus == 1 ? "在线" : "离线";
-    }
+    
   }
 };
 </script>
@@ -547,5 +823,26 @@ export default {
 .del-dialog-cnt {
   font-size: 16px;
   text-align: center;
+}
+.geoform {
+  padding: 0 0 0 20px;
+}
+.geoform > p {
+  font-size: 19px;
+}
+.geoFence {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: auto;
+  margin: 0;
+  z-index: 2026;
+}
+.geoFence > div {
+  width: 1300px;
+  padding: 20px 20px 0 20px;
+  margin-top: 15vh;
 }
 </style>
