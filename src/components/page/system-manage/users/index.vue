@@ -309,12 +309,12 @@ export default {
     excel
   },
   created() {
-    this.getData();
-    this.getAllPermissions();
-    this.getRoleCombobox();
-    this.GetDistricts();
-    this.GetUsersType();
-    this.getSkills();
+    // this.getData();
+    // this.getAllPermissions();
+    // this.getRoleCombobox();
+    // this.GetDistricts();
+    // this.GetUsersType();
+    // this.getSkills();
   },
   computed: {
     data() {

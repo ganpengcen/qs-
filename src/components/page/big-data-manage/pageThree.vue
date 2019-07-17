@@ -117,22 +117,17 @@ export default {
       iconplay:false
     };
   },
-  beforeCreate() {
-    // document.getElementById("appLoading").style.display = "block";
-  },
-  computed: {},
   created() {
-    this.GetXyStatisticsSummary(); //社区矫正统计概况
-    this.GetXyFinishedReporting(); //学习情况
-    // document.getElementById("appLoading").style.display = "none";
+    // this.GetXyStatisticsSummary(); //社区矫正统计概况
+    // this.GetXyFinishedReporting(); //学习情况
   },
   mounted() {
-    this.echarts_xyDate(); //周期统计
-    this.echarts_xyType(); //类型占比
-    this.echarts_xyages(); //年龄分布
-    this.echarts_xysex(); //性别
-    this.echarts_correct(); //矫正人员统计
-    this.openTimer();
+    // this.echarts_xyDate(); //周期统计
+    // this.echarts_xyType(); //类型占比
+    // this.echarts_xyages(); //年龄分布
+    // this.echarts_xysex(); //性别
+    // this.echarts_correct(); //矫正人员统计
+    // this.openTimer();
   },
 
   methods: {

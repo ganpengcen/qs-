@@ -281,23 +281,23 @@ export default {
   },
   beforeCreate() {},
   created() {
-    this.GetDashboardStatisticCount();
+    // this.GetDashboardStatisticCount();
   },
   mounted() {
-    this.GetDashboardSummary(); //工作台信息
-    this.echarts_1(); //法律援助类型统计
-    this.echarts_2(); //社区矫正人数统计
-    this.echarts_4(); //人民调解分类统计
-    //this.echarts_5(); //群发言总排行数
-    this.GetTopMostChatGroups(); //群发言总排行数
-    this.echarts_6(); //用户发言排行
-    this.echarts_7(); //街道案件统计
-    //this.echarts_8(); //根据区域统计上报信息
-    this.echarts_11(); //热词
-    this.echarts_12(); //根据区域统计上报信息
-    this.show = false;
-    this.openTimer();
-    this.openImgTimer();
+    // this.GetDashboardSummary(); //工作台信息
+    // this.echarts_1(); //法律援助类型统计
+    // this.echarts_2(); //社区矫正人数统计
+    // this.echarts_4(); //人民调解分类统计
+    // //this.echarts_5(); //群发言总排行数
+    // this.GetTopMostChatGroups(); //群发言总排行数
+    // this.echarts_6(); //用户发言排行
+    // this.echarts_7(); //街道案件统计
+    // //this.echarts_8(); //根据区域统计上报信息
+    // this.echarts_11(); //热词
+    // this.echarts_12(); //根据区域统计上报信息
+    // this.show = false;
+    // this.openTimer();
+    // this.openImgTimer();
   },
   methods: {
     setDash() {

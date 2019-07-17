@@ -336,8 +336,19 @@ export default {
         name: [{ required: true, message: "必填", trigger: "blur" }],
         gender: [{ required: true, message: "请选择", trigger: "change" }],
         area: [{ required: true, message: "请选择", trigger: "change" }],
-        phone: [{ required: true, message: "必填", trigger: "blur" }],
-        identityCard: [{ required: true, message: "必填", trigger: "blur" }],
+        phone: [{ required: true, message: "必填", trigger: "blur" },
+         {
+            pattern: /^0{0,1}(13[0-9]|15[7-9]|153|156|18[7-9])[0-9]{8}$/,
+            message: '手机号码格式有误',
+            trigger: 'blur'
+          }],
+        identityCard: [{ required: true, message: "必填", trigger: "blur" },
+         {
+            pattern: /(^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$)|(^[1-9]\d{5}\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{2}$)/,
+            message: '证件号码格式有误！',
+            trigger: 'blur'
+          }
+        ],
         address: [{ required: true, message: "必填", trigger: "blur" }],
         nativePlace: [{ required: true, message: "必填", trigger: "blur" }],
         type: [{ required: true, message: "请选择", trigger: "change" }],

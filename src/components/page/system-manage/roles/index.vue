@@ -122,8 +122,8 @@ export default {
   watch: {},
   components: {},
   created() {
-    this.getData();
-    this.getAllPermissions();
+    // this.getData();
+    // this.getAllPermissions();
   },
   computed: {
     data() {

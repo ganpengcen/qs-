@@ -76,25 +76,8 @@ const dynamicRoutes = [
                     title: '字典数据',
                     // icon: 'icon-xs-book'                 
                 }
-            },
-            {
-                path: 'Districts',
-                name: 'Districts',
-                component: resolve => require(['page/data-manage/Districts'], resolve),
-                meta: {
-                    title: '区域',
-                    // icon: 'icon-xs-quyuguanli'                   
-                }
-            },
-            {
-                path: 'ReportUnit',
-                name: 'ReportUnit',
-                component: resolve => require(['page/data-manage/ReportUnit'], resolve),
-                meta: {
-                    title: '上报单位',
-                    // icon: 'icon-xs-jilu'                   
-                }
-            }            
+            }
+                  
         ]
     },
     
@@ -261,16 +244,7 @@ const dynamicRoutes = [
             },
             
         ]
-    },
-    {
-        path: 'FeedBack',
-        name: 'FeedBack',
-        component: resolve => require(['page/FeedBack-manage/FeedBack'], resolve),
-        meta: {
-            title: '意见反馈',
-            icon: "icon-xs-xiaolian",     
-        }
-    },
+    }
 
    
 ]

@@ -180,7 +180,7 @@ export default {
   },
   components: {},
   created() {
-    this.getOrganization();
+    // this.getOrganization();
   },
   updated() {},
   computed: {

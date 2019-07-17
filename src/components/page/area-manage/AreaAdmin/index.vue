@@ -98,8 +98,8 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="用户名" prop="userName" v-if="titleT == '添加区域管理员'">
-          <el-input v-model="editForm.userName"></el-input>
+        <el-form-item label="用户名" prop="userName">
+          <el-input v-model="editForm.userName" :disabled="titleT == '添加区域管理员'? false: true"></el-input>
         </el-form-item>
         <el-form-item label="密码（至少包含一个数字，至少6个字符）" prop="password" v-if="titleT == '添加区域管理员'">
           <el-input v-model="editForm.password"></el-input>

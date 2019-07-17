@@ -192,27 +192,22 @@ export default {
       iconplay:false
     };
   },
-  beforeCreate() {
-    // document.getElementById("appLoading").style.display = "block";
-  },
-  computed: {},
   created() {
-    this.OnlineLawyerNowSummary(); //当前活跃律师
-    this.GetDashboardSummary(); //工作台信息
-    this.OnlineQuestionNowTop5(); //实时咨询
-    this.GetDashboardStatisticCount();
-    this.LawyerAnswerRank(); //律师回复排行
-    // document.getElementById("appLoading").style.display = "none";
+    // this.OnlineLawyerNowSummary(); //当前活跃律师
+    // this.GetDashboardSummary(); //工作台信息
+    // this.OnlineQuestionNowTop5(); //实时咨询
+    // this.GetDashboardStatisticCount();
+    // this.LawyerAnswerRank(); //律师回复排行
   },
   mounted() {
-    this.GetServiceAgencies();
-    this.echarts_onlineCount(); //在线法律咨询总量分析
-    this.echarts_9(); // 公共服务机构问题统计
-    this.echarts_10(); //咨询类型占比
-    this.echarts_ages(); //年龄分布
-    this.echarts_sex(); //性别
-    this.echarts_hot(); //咨询热词
-    this.openTimer();
+    // this.GetServiceAgencies();
+    // this.echarts_onlineCount(); //在线法律咨询总量分析
+    // this.echarts_9(); // 公共服务机构问题统计
+    // this.echarts_10(); //咨询类型占比
+    // this.echarts_ages(); //年龄分布
+    // this.echarts_sex(); //性别
+    // this.echarts_hot(); //咨询热词
+    // this.openTimer();
   },
 
   methods: {
