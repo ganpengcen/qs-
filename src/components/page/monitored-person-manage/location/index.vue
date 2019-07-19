@@ -6,8 +6,6 @@
     </div>
     <div class="container">
       <div class="handle-box">
-        <el-date-picker v-model="form.trackDate" type="date" placeholder="请选择日期" >
-        </el-date-picker>
         <el-select
           style="width:230px"
           v-model="areaId"
@@ -31,7 +29,7 @@
             :value="item.deviceNo"
           ></el-option>
         </el-select>
-        <el-button type="primary" icon="search" @click="TrackingLine()">查询</el-button>
+        <el-button type="primary" icon="search" @click="TrackingTime()">查询</el-button>
       </div>
       <div class="mapbox">
         <!-- 地图 -->
@@ -59,6 +57,7 @@ export default {
       areaId: "",
       pickerOptions2: DatePicker,
       form: {
+        transportMode:"walking",
         entityName: "",
         trackDate: new Date(),
         isProcessed: false
@@ -97,16 +96,6 @@ export default {
     };
   },
   methods: {
-    async TrackingLine() {
-      try {
-        const res = await Post(Api.TrackingLine, this.form);
-        if (res) {
-        }
-        this.addVisible = false;
-      } catch (e) {
-        console.log(e);
-      }
-    },
     // 获取区域列表
     async GetAllArea() {
       try {
@@ -117,6 +106,7 @@ export default {
       }
     },
     async GetPersonByArea() {
+      this.form.entityName = "";
       try {
         const res = await Get(Api.GetPersonByArea + this.areaId);
         this.personList = res;
@@ -149,12 +139,12 @@ export default {
       var geoc = new BMap.Geocoder();
       geoc.getLocation(p, rs => {
         var contentInfo =
-          '<div style="margin:0;font-size:13px;line-height:20px;padding:2px;">车牌：' +
-          content.license_plate +
+          '<div style="margin:0;font-size:13px;line-height:20px;padding:2px;">方向：' +
+          content.direction_desc +
           "<br/>地址：" +
           rs.address +
           "<br/>时间：" +
-          content.equipment_time +
+          content.loc_time_desc +
           "</div>";
         var infoWindow = new BMap.InfoWindow(contentInfo, this.opts); // 创建信息窗口对象
         this.maps.openInfoWindow(infoWindow, p); //开启信息窗口
@@ -167,12 +157,15 @@ export default {
         const res = await Post(Api.TrackingTime, this.form);
           if (res) {
             var pointArr = [];
-            var datas = res;
-            for (var i = 0; i < datas.length; i++) {
-              var p = new BMap.Point(datas[i].longitude, datas[i].latitude);
+            var datas = res.latest_point;
+            // for (var i = 0; i < datas.length; i++) {
+            //   var p = new BMap.Point(datas[i].longitude, datas[i].latitude);
+            //   pointArr.push(p);
+            //   this.addMarker(p, datas[i]);
+            // }
+               var p = new BMap.Point(datas.longitude, datas.latitude);
               pointArr.push(p);
-              this.addMarker(p, datas[i]);
-            }
+              this.addMarker(p, datas);
             this.maps.setViewport(pointArr);
           }
       } catch (e) {

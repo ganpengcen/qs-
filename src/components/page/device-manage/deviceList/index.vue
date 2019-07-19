@@ -3,7 +3,7 @@
     <div class="title">
       <span class="big">设备列表</span>
       <span class="small">管理设备列表</span>
-      <!-- v-has="'Pages.Foundations.DicData.Create'" -->
+      <el-button type="primary"  @click="send('CTRL 32005555#02')" class="btn">发消息</el-button>
       <el-button type="primary" icon="el-icon-edit" @click="handleAdd('添加设备')" class="btn">添加设备</el-button>
     </div>
     <!--表格-->
@@ -74,7 +74,7 @@
                   <el-dropdown-item>
                     <p @click="handleEdit('修改')">修改设备</p>
                   </el-dropdown-item>
-                   <el-dropdown-item>
+                  <el-dropdown-item>
                     <p @click="handleConfig()">配置参数</p>
                   </el-dropdown-item>
                   <el-dropdown-item v-show="!scope.row.active" divided>
@@ -93,20 +93,70 @@
               </el-dropdown>
             </template>
           </el-table-column>
+          <el-table-column prop="area" label="区域" min-width="120px" sortable="custom"></el-table-column>
           <el-table-column prop="serialNo" label="设备串号" min-width="160px" sortable="custom"></el-table-column>
           <el-table-column prop="businessNo" label="业务编号" min-width="160px" sortable="custom"></el-table-column>
-          <el-table-column prop="area" label="区域" min-width="120px" sortable="custom"></el-table-column>
-          <el-table-column prop="active" label="是否激活"  min-width="100px" sortable="custom">
+          <el-table-column prop="bat" label="电量" min-width="100px" sortable="custom">
             <template slot-scope="scope">
-              <p :class="[{'text-danger':!scope.row.active},{'text-safe':scope.row.active}]">{{scope.row.active?'已激活':'未激活'}}</p>
+              <el-tooltip class="item" effect="dark" :content="String(scope.row.bat)" placement="right-end">
+                <i
+                  :class="[scope.row.bat == 0 ?'icon-xs-battery-0 text-danger': scope.row.bat <= 20 ?'icon-xs-battery1 text-danger':scope.row.bat > 20 && scope.row.bat <= 50 ?'icon-xs-battery2':scope.row.bat > 50 && scope.row.bat <= 80 ?'icon-xs-battery3':'icon-xs-battery-4 full-electric']"
+                ></i>
+              </el-tooltip>
             </template>
           </el-table-column>
-          <el-table-column  prop="deviceStatus" label="绑定状态" min-width="100px" sortable="custom">
+          <el-table-column prop="signal" label="信号强度" min-width="100px" sortable="custom">
             <template slot-scope="scope">
-             <p :class="[{'text-danger':scope.row.deviceStatus == 3},{'text-safe':scope.row.deviceStatus == 2}]">{{scope.row.deviceStatus == 1?'未绑定':scope.row.deviceStatus == 2?'已绑定':'错误'}}</p>
+              <el-tooltip
+                class="item"
+                effect="dark"
+                :content="String(scope.row.signal)"
+                placement="right-end"
+              >
+                <i
+                  :class="[scope.row.signal <= 20 ?'icon-xs-Signal-':scope.row.signal > 20 && scope.row.signal <= 50 ?'icon-xs-Signal-2':scope.row.signal > 50 && scope.row.signal <= 80 ?'icon-xs-Signal-3':'icon-xs-Signal-1']"
+                ></i>
+              </el-tooltip>
             </template>
           </el-table-column>
-          <el-table-column :formatter="isonline" prop="onlineStatus" label="在线状态" min-width="100px" sortable="custom"></el-table-column>         
+          <el-table-column prop="alarmType" label="报警类型" min-width="150px" sortable="custom">
+            <template slot-scope="scope">
+              <p>{{alarmType[scope.row.alarmType]}}</p>
+            </template>
+          </el-table-column>
+          <el-table-column prop="locationType" label="定位类型" min-width="150px" sortable="custom">
+            <template slot-scope="scope">
+              <p>{{locationType[scope.row.locationType]}}</p>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="latestAddress"
+            label="最后定位地址"
+            show-overflow-tooltip
+            min-width="160px"
+            sortable="custom"
+          ></el-table-column>
+          <el-table-column prop="active" label="是否激活" min-width="100px" sortable="custom">
+            <template slot-scope="scope">
+              <p
+                :class="[{'text-danger':!scope.row.active},{'text-safe':scope.row.active}]"
+              >{{scope.row.active?'已激活':'未激活'}}</p>
+            </template>
+          </el-table-column>
+          <el-table-column prop="deviceStatus" label="绑定状态" min-width="100px" sortable="custom">
+            <template slot-scope="scope">
+              <p
+                :class="[{'text-danger':scope.row.deviceStatus == 3},{'text-safe':scope.row.deviceStatus == 2}]"
+              >{{scope.row.deviceStatus == 1?'未绑定':scope.row.deviceStatus == 2?'已绑定':'错误'}}</p>
+            </template>
+          </el-table-column>
+          <el-table-column
+            :formatter="isonline"
+            prop="onlineStatus"
+            label="在线状态"
+            min-width="100px"
+            sortable="custom"
+          ></el-table-column>
           <el-table-column
             prop="dueDate"
             :formatter="formatTableDate"
@@ -127,7 +177,12 @@
       </div>
     </div>
     <!-- 添加、编辑弹出框 -->
-    <el-dialog :title="titleT" :visible.sync="addVisible" :close-on-click-modal="false" width="600px">
+    <el-dialog
+      :title="titleT"
+      :visible.sync="addVisible"
+      :close-on-click-modal="false"
+      width="600px"
+    >
       <el-form ref="creatOrEditForm" :model="editForm" :rules="rules">
         <el-form-item label="设备串号" prop="serialNo">
           <el-input v-model="editForm.serialNo"></el-input>
@@ -204,6 +259,8 @@ export default {
   name: "deviceList",
   data() {
     return {
+      path: "ws://sfapi.quickcq.com:8900",
+      socket: "",
       titleT: "",
       tableData: [],
       cur_page: 1,
@@ -228,23 +285,35 @@ export default {
         phoneNumbers: "",
         emailAddresses: ""
       },
-      configForm:{
-        yj1:"",
-        yj2:"",
-        jt:"",
-        bj:"",
-        sj:"",
-        language:"1",
-        sendmode:"1",
-        linkmode:"1",
-        psw:""
-
+      configForm: {
+        yj1: "",
+        yj2: "",
+        jt: "",
+        bj: "",
+        sj: "",
+        language: "1",
+        sendmode: "1",
+        linkmode: "1",
+        psw: ""
       },
       deviceStatus: [
         { value: 1, displayText: "未绑定" },
         { value: 2, displayText: "已绑定" },
         { value: 3, displayText: "错误" }
       ],
+      alarmType: {
+        "1": "断带报警",
+        "2": "低电报警",
+        "3": "断带报警,低电报警"
+      },
+      locationType: {
+        "1": "GPS",
+        "2": "基站",
+        "3": "WIFI",
+        "4": "CDMA基站数据",
+        "5": "定位失败",
+        "6": "盲区断带报警"
+      },
       onLineStatus: [
         { value: 1, displayText: "在线" },
         { value: 2, displayText: "离线" }
@@ -264,6 +333,10 @@ export default {
       return this.tableData;
     }
   },
+  mounted() {
+    // 初始化socket
+    this.init();
+  },
   watch: {
     cur_page(curVal, oldVal) {
       this.cur_page = curVal; //页数
@@ -275,7 +348,42 @@ export default {
       }
     }
   },
+  destroyed() {
+    // 销毁监听
+    console.log('离开')
+    this.socket.onclose = this.close;
+  },
   methods: {
+    init: function() {
+      if (typeof WebSocket === "undefined") {
+        alert("您的浏览器不支持socket");
+      } else {
+        // 实例化socket
+        this.socket = new WebSocket(this.path);
+        // 监听socket连接
+        this.socket.onopen = this.open;
+        // 监听socket错误信息
+        this.socket.onerror = this.error;
+        // 监听socket消息
+        this.socket.onmessage = this.getMessage;
+      }
+    },
+    open: function() {
+      console.log("socket连接成功");
+    },
+    error: function() {
+      console.log("连接错误");
+    },
+    getMessage: function(msg) {
+      console.log(msg.data);
+    },
+    send: function(params) {
+      console.log(params)
+      this.socket.send(params);
+    },
+    close: function() {
+      console.log("socket已经关闭");
+    },
     // 表格排序
     sortChange: function(column) {
       if (column.order == null) {
@@ -324,7 +432,7 @@ export default {
         console.log(e);
       }
     },
-    handleConfig(){
+    handleConfig() {
       this.configVisible = true;
     },
     handleActive() {
@@ -421,8 +529,7 @@ export default {
     },
     isonline(data) {
       return data.onlineStatus == 1 ? "在线" : "离线";
-    },
-   
+    }
   }
 };
 </script>
@@ -446,6 +553,7 @@ export default {
   }
   .btn {
     float: right;
+    margin-left: 10px;
   }
 }
 .handle-box {

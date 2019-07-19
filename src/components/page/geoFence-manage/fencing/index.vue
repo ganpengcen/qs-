@@ -190,6 +190,7 @@ export default {
       }
     },
     async GetPersonByArea() {
+      this.form.entityName = "";
       try {
         const res = await Get(Api.GetPersonByArea + this.areaId);
         this.personList = res;

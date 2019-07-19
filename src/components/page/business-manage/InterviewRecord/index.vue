@@ -4,7 +4,7 @@
       <span class="big">面谈记录</span>
       <span class="small">管理面谈记录</span>
       <!-- v-has="'Pages.Foundations.DicData.Create'" -->
-      <el-button type="primary" icon="el-icon-edit" @click="handleAdd('添加区域')" class="btn">添加新区域</el-button>
+      <el-button type="primary" icon="el-icon-edit" @click="handleAdd('添加记录')" class="btn">添加新记录</el-button>
     </div>
     <!--表格-->
     <div class="container">
@@ -15,6 +15,25 @@
           class="handle-input"
           @keyup.enter.native="getData"
         ></el-input>
+        <el-select
+          style="width:230px"
+          v-model="ruleForm.areaId"
+          placeholder="请选择区域"
+          clearable
+          @change="GetPersonByAreafilter()"
+        >
+          <el-option v-for="item in areas" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
+        <el-select
+          style="width:230px"
+          v-show="ruleForm.areaId"
+          v-model="ruleForm.personId"
+          placeholder="请选择监控对象"
+          clearable
+          @change="getData()"
+        >
+          <el-option v-for="item in personList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
         <el-button type="primary" icon="search" @click="getData()">搜索</el-button>
       </div>
       <div class="tableThCol">
@@ -34,8 +53,15 @@
                 </span>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item>
-                    <p @click="handleEdit('修改')">修改</p>
+                    <p @click="handleDetails()">查看详情</p>
                   </el-dropdown-item>
+                  <el-dropdown-item v-show="scope.row.status == 1">
+                    <p @click="handleEditTalk()">修改约谈</p>
+                  </el-dropdown-item>
+                  <el-dropdown-item v-show="scope.row.status == 1">
+                    <p @click="talkVisible = true">执行约谈</p>
+                  </el-dropdown-item>
+                  
                   <el-dropdown-item>
                     <p @click="handleDelete(scope.$index, scope.row)">删除</p>
                   </el-dropdown-item>
@@ -43,11 +69,27 @@
               </el-dropdown>
             </template>
           </el-table-column>
-          <el-table-column prop="name" label="名称" min-width="160px" sortable="custom"></el-table-column>
+          <el-table-column prop="area" label="地区" min-width="120px" sortable="custom"></el-table-column>
+          <el-table-column prop="person" label="约谈人" min-width="120px" sortable="custom"></el-table-column>
           <el-table-column
-            prop="dateAdded"
+            prop="reason"
+            label="理由"
+            min-width="180px"
+            show-overflow-tooltip
+            sortable="custom"
+          ></el-table-column>
+          <el-table-column prop="address" label="地址" min-width="140px" sortable="custom"></el-table-column>
+          <el-table-column prop="status" label="是否处理" min-width="100px" sortable="custom">
+            <template slot-scope="scope">
+              <p
+                :class="[{'text-danger':scope.row.status == 1},{'text-safe':scope.row.status == 2}]"
+              >{{scope.row.status == 2?'已处理':'未处理'}}</p>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="scheduleTime"
             :formatter="formatTableDate"
-            label="创建日期"
+            label="日期"
             sortable="custom"
             width="140px"
           ></el-table-column>
@@ -64,15 +106,117 @@
       </div>
     </div>
     <!-- 添加、编辑弹出框 -->
-    <el-dialog :title="titleT" :visible.sync="addVisible" width="600px">
-      <el-form ref="creatOrEditForm" :model="editForm" :rules="rules">
-        <el-form-item label="名称" prop="name">
-          <el-input v-model="editForm.name"></el-input>
+    <el-dialog title="添加约谈" :visible.sync="addVisible" width="600px">
+      <el-form ref="createForm" :model="addForm" :rules="rules">
+        <el-form-item label="选择区域" prop="areaId">
+          <el-select
+            style="width:100%"
+            v-model="addForm.areaId"
+            placeholder="请选择区域"
+            clearable
+            @change="GetPersonByArea()"
+          >
+            <el-option v-for="item in areas" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
+        </el-form-item>     
+        <el-form-item label="约谈人" prop="personId">
+          <el-select style="width:100%" v-model="addForm.personId" placeholder="请选择监控对象" clearable>
+            <el-option
+              v-for="item in personList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="理由" prop="reason">
+          <el-input type="textarea" :rows="4" v-model="addForm.reason"></el-input>
+        </el-form-item>
+        <el-form-item label="地址" prop="address">
+          <el-input v-model="addForm.address"></el-input>
+        </el-form-item>
+        <el-form-item label="组织者" prop="organizer">
+          <el-input v-model="addForm.organizer"></el-input>
+        </el-form-item>
+        <el-form-item label="安排日期" prop="scheduleTime">
+          <el-date-picker
+            style="width:100%"
+            v-model="addForm.scheduleTime"
+            type="date"
+            placeholder="选择日期"
+          ></el-date-picker>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="addVisible = false">取 消</el-button>
-        <el-button type="primary" @click="CreateOrUpdate('creatOrEditForm')">确 定</el-button>
+        <el-button type="primary" @click="CreateTalk('createForm')">确 定</el-button>
+      </span>
+    </el-dialog>
+     <el-dialog title="约谈详情" :visible.sync="detailVisible" width="600px">
+      <el-form  :model="detailForm" disabled>     
+        <el-form-item label="区域" prop="area">
+          <el-input v-model="detailForm.area" ></el-input>
+        </el-form-item>
+        <el-form-item label="约谈人" prop="person">
+          <el-input v-model="detailForm.person"></el-input>
+        </el-form-item>
+        <el-form-item label="理由" prop="reason">
+          <el-input type="textarea" :rows="4" v-model="detailForm.reason"></el-input>
+        </el-form-item>
+        <el-form-item label="地址" prop="address">
+          <el-input v-model="detailForm.address"></el-input>
+        </el-form-item>
+        <el-form-item label="组织者" prop="organizer">
+          <el-input v-model="detailForm.organizer"></el-input>
+        </el-form-item>
+        <el-form-item label="安排日期" prop="scheduleTime">
+          <el-date-picker
+            style="width:100%"
+            v-model="detailForm.scheduleTime"
+            type="date"
+            placeholder="选择日期"
+          ></el-date-picker>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="detailVisible = false">取 消</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog title="修改约谈" :visible.sync="editVisible" width="600px">
+      <el-form ref="EditForm" :model="editForm" :rules="rules">         
+        <el-form-item label="理由" prop="reason">
+          <el-input type="textarea" :rows="4" v-model="editForm.reason"></el-input>
+        </el-form-item>
+        <el-form-item label="地址" prop="address">
+          <el-input v-model="editForm.address"></el-input>
+        </el-form-item>
+        <el-form-item label="安排日期" prop="scheduleTime">
+          <el-date-picker
+            style="width:100%"
+            v-model="editForm.scheduleTime"
+            type="date"
+            placeholder="选择日期"
+          ></el-date-picker>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editVisible = false">取 消</el-button>
+        <el-button type="primary" @click="UpdateTalk('EditForm')">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog title="执行约谈" :visible.sync="talkVisible" width="600px">
+      <el-form ref="talkForm" :model="talkForm" :rules="talkrules">
+        <el-form-item label="结果" prop="result">
+          <el-input type="textarea" :rows="4" v-model="talkForm.result"></el-input>
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="talkForm.remark"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="talkVisible = false">取 消</el-button>
+        <el-button type="primary" @click="CreateResult('talkForm')">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -86,27 +230,53 @@ export default {
   name: "InterviewRecord",
   data() {
     return {
-      titleT: "",
+      detailForm:{},
       tableData: [],
+      areas: [],
+      personList: [],
       cur_page: 1,
       totalCount: 0,
       addVisible: false,
+      detailVisible: false,
+      editVisible: false,
+      talkVisible: false,
       ruleForm: {
+        areaId: "",
+        personId: "",
         filter: "",
-        sorting: "DateAdded desc",
+        sorting: "scheduleTime desc",
         maxResultCount: 10,
         skipCount: 0
       },
       id: "",
-      editForm: {
-        name: ""
+      addForm: {
+        areaId: "",
+        personId: "",
+        reason: "",
+        address: "",
+        scheduleTime: "",
+        organizer: ""
+      },
+      editForm:{
+
+      },
+      talkForm: {
+        result: "",
+        remark: ""
       },
       rules: {
-        name: [{ required: true, message: "必填", trigger: "blur" }]
+        reason: [{ required: true, message: "必填", trigger: "blur" }],
+        areaId: [{ required: true, message: "请选择", trigger: "change" }],
+        personId: [{ required: true, message: "请选择", trigger: "change" }],
+        scheduleTime: [{ required: true, message: "请选择", trigger: "change" }]
+      },
+      talkrules:{
+        result: [{ required: true, message: "必填", trigger: "blur" }],
       }
     };
   },
   created() {
+    this.GetAllArea();
     this.getData();
   },
   computed: {
@@ -121,7 +291,7 @@ export default {
     },
     addVisible(curVal) {
       if (!curVal) {
-        this.$resetForm(this.$refs["creatOrEditForm"]);
+        this.$resetForm(this.$refs["createForm"]);
       }
     }
   },
@@ -146,26 +316,81 @@ export default {
       this.ruleForm.maxResultCount = val;
       this.getData();
     },
-    CreateOrUpdate(formName) {
+    CreateTalk(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          if (this.titleT == "添加区域") {
             this.Create();
-          } else {
-            this.Update();
-          }
         } else {
           console.log("error submit!!");
           return false;
         }
       });
     },
+    UpdateTalk(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+            this.Update();
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
+    CreateResult(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+            this.ExecutionTalk();
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
+    async ExecutionTalk() {
+      try {
+        const res = await Put(Api.ExecutionTalk + this.id, this.detailForm);
+        this.$message.success("操作成功");
+        this.getData();
+        this.talkVisible = false;
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    // 获取区域列表
+    async GetAllArea() {
+      try {
+        const res = await Get(Api.GetAllArea, {});
+        this.areas = res;
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async GetPersonByAreafilter() {
+      this.ruleForm.personId = ""
+      this.getData()
+      try {
+        const res = await Get(Api.GetPersonByArea + this.ruleForm.areaId);
+        this.personList = res;
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async GetPersonByArea() {
+      this.addForm.personId = "";
+      this.getData()
+      try {
+        const res = await Get(Api.GetPersonByArea + this.addForm.areaId);
+        this.personList = res;
+      } catch (e) {
+        console.log(e);
+      }
+    },
     // 获取列表数据
     async getData() {
       this.ruleForm.skipCount =
         (this.cur_page - 1) * this.ruleForm.maxResultCount;
       try {
-        const res = await Post(Api.GetAreaList, this.ruleForm);
+        const res = await Post(Api.GetTalkList, this.ruleForm);
         if (res) {
           this.tableData = res.items;
           this.totalCount = res.totalCount;
@@ -188,7 +413,7 @@ export default {
     },
     async delTemplateMsg() {
       try {
-        const res = await Delete(Api.Area + this.id);
+        const res = await Delete(Api.Talk + this.id);
         this.$message.success("删除成功");
         this.getData();
       } catch (e) {
@@ -196,11 +421,21 @@ export default {
       }
     },
     // 获取编辑页面
-    async handleEdit(title) {
-      this.addVisible = true;
-      this.titleT = title;
+    async handleDetails() {
       try {
-        const res = await Get(Api.Area + this.id);
+        const res = await Get(Api.Talk + this.id);
+        if (res) {
+          this.detailForm = res;
+          this.detailVisible = true;
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async handleEditTalk() {
+      this.editVisible = true;
+      try {
+        const res = await Get(Api.GetTalkForEdit + this.id);
         if (res) {
           this.editForm = res;
         }
@@ -210,13 +445,12 @@ export default {
     },
     //添加
     handleAdd(title) {
-      this.$delete(this.editForm, "id");
-      this.titleT = title;
+      this.$delete(this.detailForm, "id");
       this.addVisible = true;
     },
     async Create() {
       try {
-        const res = await Post(Api.CreateArea, this.editForm);
+        const res = await Post(Api.CreateTalk, this.detailForm);
         this.$message.success("操作成功");
         this.getData();
         this.addVisible = false;
@@ -226,14 +460,14 @@ export default {
     },
     async Update() {
       try {
-        const res = await Put(Api.Area + this.id, this.editForm);
+        const res = await Put(Api.Talk + this.id, this.editForm);
         this.$message.success("操作成功");
         this.getData();
-        this.addVisible = false;
+        this.editVisible = false;
       } catch (e) {
         console.log(e);
       }
-    },
+    }
   }
 };
 </script>

@@ -100,6 +100,11 @@ export default {
 	Person:'/api/person/',
 	BindDevice:'/api/person/bind',
 	Unbind:'/api/person/unbind/',
+	GetTalkList:'/api/talk/list',
+	CreateTalk:'/api/talk',
+	GetTalkForEdit:'/api/talk/edit/',
+	Talk:'/api/talk/',
+	ExecutionTalk:'/api/talk/execution/',
 	//----------------------------业务管理-----------------------------------
 	// 报警
 	GetAlarmList:'/api/alarm/list',

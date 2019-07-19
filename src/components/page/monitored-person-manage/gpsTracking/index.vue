@@ -9,17 +9,7 @@
     </div>
     <div class="container">
       <div class="handle-box">
-        <!-- <el-date-picker
-          v-model="dateArr"
-          type="daterange"
-          align="right"
-          unlink-panels
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          :picker-options="pickerOptions2"
-        ></el-date-picker> -->
-        <el-date-picker v-model="form.trackDate" type="date" placeholder="请选择日期" >
+        <el-date-picker v-model="form.trackDate" :clearable="false"  type="date" placeholder="请选择日期" >
         </el-date-picker>
         <el-select
           style="width:230px"
@@ -98,8 +88,9 @@ export default {
         skipCount: 0
       },
       form: {
+        transportMode:"walking",
         entityName: "",
-        trackDate: new Date(),
+        trackDate: new Date(new Date(new Date().toLocaleDateString()).getTime()),
         isProcessed: false
       },
       vehicles: [],
@@ -113,26 +104,11 @@ export default {
     };
   },
   watch: {
-    // dateArr: {
-    //   handler(val, oldVal) {
-    //     if (val == null) {
-    //       this.ruleForm.beginTime = "";
-    //       this.ruleForm.endTime = "";
-    //     } else {
-    //       this.ruleForm.beginTime = val[0];
-    //       this.ruleForm.endTime = val[1];
-    //     }
-    //   },
-    //   deep: true
-    // }
   },
   created() {
     this.hh();
     this.GetAllArea();
-    this.end = new Date();
-    this.start = new Date();
-    this.start.setTime(this.start.getTime() - 3600 * 1000 * 24 * 30);
-    this.dateArr = [this.start, this.end];
+    
   },
   mounted() {
     this.initMap();
@@ -143,77 +119,24 @@ export default {
   },
   methods: {
     async TrackingLine() {
+      if (this.form.trackDate == null) {
+        this.$message.warning('请选择日期！');
+        return false;
+      }
+      if (this.form.entityName == '') {
+        this.$message.warning('请选择人员！');
+        return false;
+      }
       try {
         const res = await Post(Api.TrackingLine, this.form);
         if (res) {
-        }
-        this.addVisible = false;
-      } catch (e) {
-        console.log(e);
-      }
-    },
-    // 获取区域列表
-    async GetAllArea() {
-      try {
-        const res = await Get(Api.GetAllArea, {});
-        this.areas = res;
-      } catch (e) {
-        console.log(e);
-      }
-    },
-    async GetPersonByArea() {
-      try {
-        const res = await Get(Api.GetPersonByArea + this.areaId);
-        this.personList = res;
-      } catch (e) {
-        console.log(e);
-      }
-    },
-    checkItem(index, num, date) {
-      this.isActive = index; // 点击列表改变样式
-      this.getGpsTracking(num, date);
-    },
-    // 地图
-    initMap() {
-      var map = new BMap.Map(this.$refs.allmap); // 创建Map实例
-      this.maps = map;
-      var point = new BMap.Point(120.3643, 31.596037);
-      var geoc = new BMap.Geocoder();
-      map.centerAndZoom(point, 15);
-      map.enableScrollWheelZoom(); //启用滚轮放大缩小
-    },
-    // 获取车牌数据
-    async getVehicles() {
-      let url = "/api/services/app/vehicle/GetVehicles";
-      try {
-        const res = await Post(url, this.vechile);
-        this.vehicles = res.result.items;
-        for (let i = 0; i < this.vehicles.length; i++) {
-          this.vehiclesArr.push(this.vehicles[i].number);
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    },
-    // 获取车辆轨迹
-    async getGpsTracking(vNumbers, date) {
-      let url = "/api/services/app/vehicle/GetHaihuiGpsTracking";
-      let data = { number: vNumbers, date: date };
-      try {
-        if (!date) {
-          this.$message.warning("请选择日期");
-        } else {
-          const res = await Post(url, data);
-          const resp = res.result;
-          if (res.success) {
-            if (resp.status == "success") {
-              if (resp.data) {
+          if (res.points.length != 0) {
                 var pointArr = [];
-                for (var i = 0; i < resp.data.length; i++) {
+                for (var i = 0; i < res.points.length; i++) {
                   pointArr.push(
                     new BMap.Point(
-                      resp.data[i].longitude,
-                      resp.data[i].latitude
+                      res.points[i].longitude,
+                      res.points[i].latitude
                     )
                   );
                 }
@@ -237,22 +160,50 @@ export default {
                       "static/img/icon_en.png",
                       new BMap.Size(30, 36)
                     );
-                    this.displaySpecialPoint(start, stIcon, resp.data[0]);
+                    this.displaySpecialPoint(start, stIcon, res.points[0]);
                     this.displaySpecialPoint(
                       end,
                       endIcon,
-                      resp.data[resp.data.length - 1]
+                      res.points[res.points.length - 1]
                     );
                   }
                   this.maps.setViewport(pointArr);
                 }
+              }else{
+                this.maps.clearOverlays();
               }
-            }
-          }
         }
+        this.addVisible = false;
       } catch (e) {
         console.log(e);
       }
+    },
+    // 获取区域列表
+    async GetAllArea() {
+      try {
+        const res = await Get(Api.GetAllArea, {});
+        this.areas = res;
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async GetPersonByArea() {
+      this.form.entityName = ""
+      try {
+        const res = await Get(Api.GetPersonByArea + this.areaId);
+        this.personList = res;
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    // 地图
+    initMap() {
+      var map = new BMap.Map(this.$refs.allmap); // 创建Map实例
+      this.maps = map;
+      var point = new BMap.Point(120.3643, 31.596037);
+      var geoc = new BMap.Geocoder();
+      map.centerAndZoom(point, 15);
+      map.enableScrollWheelZoom(); //启用滚轮放大缩小
     },
     //初始化Lushu
     initLushu(points, e) {

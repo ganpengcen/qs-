@@ -11,9 +11,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/api':{
-        // target:'http://sifa api.xinaisys.com',      
-
-         target:'http://112.35.123.42:816',      
+         target:'http://sfapi.quickcq.com',      
           changeOrigin:true,
           pathRewrite:{
               '/api':''
