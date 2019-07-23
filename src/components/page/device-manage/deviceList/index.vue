@@ -3,7 +3,6 @@
     <div class="title">
       <span class="big">设备列表</span>
       <span class="small">管理设备列表</span>
-      <el-button type="primary"  @click="send('CTRL 32005555#02')" class="btn">发消息</el-button>
       <el-button type="primary" icon="el-icon-edit" @click="handleAdd('添加设备')" class="btn">添加设备</el-button>
     </div>
     <!--表格-->
@@ -66,7 +65,11 @@
           <el-table-column type="index" width="50"></el-table-column>
           <el-table-column label="操作" width="50" fixed>
             <template slot-scope="scope">
-              <el-dropdown trigger="click" class="iconSize" @click.native="id = scope.row.id">
+              <el-dropdown
+                trigger="click"
+                class="iconSize"
+                @click.native="selectRow = scope.row,id = scope.row.id"
+              >
                 <span class="el-dropdown-link">
                   <i class="el-icon-menu"></i>
                 </span>
@@ -80,11 +83,14 @@
                   <el-dropdown-item v-show="!scope.row.active" divided>
                     <p @click="handleActive()">激活</p>
                   </el-dropdown-item>
-                  <el-dropdown-item>
-                    <p>关机</p>
+                  <el-dropdown-item :divided="scope.row.active">
+                    <p @click="handleDevice('关闭','02')">关机</p>
                   </el-dropdown-item>
                   <el-dropdown-item>
-                    <p>重启</p>
+                    <p @click="handleDevice('重启','01')">重启</p>
+                  </el-dropdown-item>
+                  <el-dropdown-item>
+                    <p @click="handleMsg()">发送短信</p>
                   </el-dropdown-item>
                   <el-dropdown-item divided>
                     <p @click="handleDelete(scope.$index, scope.row)">删除</p>
@@ -96,11 +102,16 @@
           <el-table-column prop="area" label="区域" min-width="120px" sortable="custom"></el-table-column>
           <el-table-column prop="serialNo" label="设备串号" min-width="160px" sortable="custom"></el-table-column>
           <el-table-column prop="businessNo" label="业务编号" min-width="160px" sortable="custom"></el-table-column>
-          <el-table-column prop="bat" label="电量" min-width="100px" sortable="custom">
+          <el-table-column prop="bat" label="电量" min-width="90px" sortable="custom">
             <template slot-scope="scope">
-              <el-tooltip class="item" effect="dark" :content="String(scope.row.bat)" placement="right-end">
+              <el-tooltip
+                class="item"
+                effect="dark"
+                :content="String(scope.row.bat)"
+                placement="right-end"
+              >
                 <i
-                  :class="[scope.row.bat == 0 ?'icon-xs-battery-0 text-danger': scope.row.bat <= 20 ?'icon-xs-battery1 text-danger':scope.row.bat > 20 && scope.row.bat <= 50 ?'icon-xs-battery2':scope.row.bat > 50 && scope.row.bat <= 80 ?'icon-xs-battery3':'icon-xs-battery-4 full-electric']"
+                  :class="[scope.row.bat == 101 ?'icon-xs-chongdianzhong chongdian':scope.row.bat == 0 ?'icon-xs-battery-0 text-danger': scope.row.bat <= 20 ?'icon-xs-battery1 text-danger':scope.row.bat > 20 && scope.row.bat <= 50 ?'icon-xs-battery2':scope.row.bat > 50 && scope.row.bat <= 80 ?'icon-xs-battery3':scope.row.bat > 80 && scope.row.bat <= 100 ?'icon-xs-battery-4 full-electric':' ']"
                 ></i>
               </el-tooltip>
             </template>
@@ -124,7 +135,7 @@
               <p>{{alarmType[scope.row.alarmType]}}</p>
             </template>
           </el-table-column>
-          <el-table-column prop="locationType" label="定位类型" min-width="150px" sortable="custom">
+          <el-table-column prop="locationType" label="定位类型" min-width="140px" sortable="custom">
             <template slot-scope="scope">
               <p>{{locationType[scope.row.locationType]}}</p>
             </template>
@@ -150,17 +161,17 @@
               >{{scope.row.deviceStatus == 1?'未绑定':scope.row.deviceStatus == 2?'已绑定':'错误'}}</p>
             </template>
           </el-table-column>
+          <el-table-column prop="onlineStatus" label="在线状态" min-width="100px" sortable="custom">
+            <template slot-scope="scope">
+              <p
+                :class="[{'text-danger':scope.row.onlineStatus == 2},{'text-safe':scope.row.onlineStatus == 1}]"
+              >{{scope.row.onlineStatus == 1?'在线':'离线'}}</p>
+            </template>
+          </el-table-column>
           <el-table-column
-            :formatter="isonline"
-            prop="onlineStatus"
-            label="在线状态"
-            min-width="100px"
-            sortable="custom"
-          ></el-table-column>
-          <el-table-column
-            prop="dueDate"
+            prop="locTime"
             :formatter="formatTableDate"
-            label="到期时间"
+            label="定位时间"
             sortable="custom"
             width="140px"
           ></el-table-column>
@@ -210,42 +221,58 @@
         <el-button type="primary" @click="CreateOrUpdateDicData('creatOrEditForm')">确 定</el-button>
       </span>
     </el-dialog>
-    <el-dialog title="配置参数" :visible.sync="configVisible" width="600px">
-      <el-form ref="configForm" :model="configForm" :rules="rules">
-        <el-form-item label="应急电话1" prop="yj1">
-          <el-input v-model="configForm.yj1"></el-input>
+    <el-dialog title="配置参数" :visible.sync="configVisible" width="800px">
+      <el-form ref="ConfigForm" :model="configForm" :rules="configrules">
+        <el-form-item label="应急电话1" prop="emerPhone1">
+          <el-input v-model="configForm.emerPhone1"></el-input>
         </el-form-item>
-        <el-form-item label="应急电话2" prop="yj2">
-          <el-input v-model="configForm.yj2"></el-input>
+        <el-form-item label="应急电话2" prop="emerPhone2">
+          <el-input v-model="configForm.emerPhone2"></el-input>
         </el-form-item>
-        <el-form-item label="监听电话" prop="jt">
-          <el-input v-model="configForm.jt"></el-input>
+        <el-form-item label="监听电话" prop="listenPhone">
+          <el-input v-model="configForm.listenPhone"></el-input>
         </el-form-item>
-        <el-form-item label="最低报警电量: % (1~100)" prop="bj">
-          <el-input v-model="configForm.bj"></el-input>
+        <el-form-item label="最低报警电量: % (1~100)" prop="lowBatAlarm">
+          <el-input v-model="configForm.lowBatAlarm"></el-input>
         </el-form-item>
-        <el-form-item label="终端上传数据间隔时间: (分钟)" prop="sj">
-          <el-input v-model="configForm.sj"></el-input>
+        <el-form-item label="终端上传数据间隔时间: (分钟)" prop="timeInterval">
+          <el-input v-model="configForm.timeInterval"></el-input>
         </el-form-item>
-        <el-form-item label="语言" prop="language">
-          <el-radio v-model="configForm.language" label="1">英文</el-radio>
-          <el-radio v-model="configForm.language" label="2">中文</el-radio>
+        <el-form-item label="语言" prop="displayLanguage">
+          <el-radio v-model="configForm.displayLanguage" :label="1">英文</el-radio>
+          <el-radio v-model="configForm.displayLanguage" :label="0">中文</el-radio>
         </el-form-item>
-        <el-form-item label="数据发送模式" prop="sendmode">
-          <el-radio v-model="configForm.sendmode" label="1">socket</el-radio>
-          <el-radio v-model="configForm.sendmode" label="2">sms</el-radio>
+        <el-form-item label="数据发送模式" prop="dataTransferMode">
+          <el-radio v-model="configForm.dataTransferMode" :label="1">socket</el-radio>
+          <el-radio v-model="configForm.dataTransferMode" :label="2">sms</el-radio>
         </el-form-item>
-        <el-form-item label="终端连接模式" prop="linkmode">
-          <el-radio v-model="configForm.linkmode" label="1">短连接</el-radio>
-          <el-radio v-model="configForm.linkmode" label="2">长连接</el-radio>
+        <el-form-item label="终端定位模式" prop="locationMode">
+          <el-radio v-model="configForm.locationMode" :label="1">wifi-gps-lbs</el-radio>
+          <el-radio v-model="configForm.locationMode" :label="2">gps-wifi-lbs</el-radio>
+          <el-radio v-model="configForm.locationMode" :label="3">gps-lbs</el-radio>
+          <el-radio v-model="configForm.locationMode" :label="4">wifi-lbs</el-radio>
+          <el-radio v-model="configForm.locationMode" :label="5">lbs</el-radio>
+          <el-radio v-model="configForm.locationMode" :label="6">省电模式</el-radio>
         </el-form-item>
-        <el-form-item label="关机密码" prop="psw">
-          <el-input v-model="configForm.psw"></el-input>
+        <el-form-item label="终端连接模式" prop="connectMode">
+          <el-radio v-model="configForm.connectMode" :label="10">短连接</el-radio>
+          <el-radio v-model="configForm.connectMode" :label="20">长连接</el-radio>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="configVisible = false">取 消</el-button>
-        <el-button type="primary" @click="CreateOrUpdateDicData('configForm')">确 定</el-button>
+        <el-button type="primary" @click="EditConfig('ConfigForm')">确 定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog title="发送消息" :visible.sync="smsVisible" width="600px">
+      <el-form ref="contentForm" :model="smsForm" :rules="rulesContent">
+        <el-form-item label="短信内容(最多40字符)" prop="content">
+          <el-input type="textarea" :rows="2" v-model="smsForm.content" maxlength="40"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="smsVisible = false">取 消</el-button>
+        <el-button type="primary" @click="sendSms('contentForm')">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -253,7 +280,7 @@
 
 <script>
 import Api from "@/kites/api";
-import { changeDate } from "@/utils/date";
+import { changeDate, changeDateTime } from "@/utils/date";
 import { Post, Get, Delete, Put } from "@/api/api";
 export default {
   name: "deviceList",
@@ -262,11 +289,16 @@ export default {
       path: "ws://sfapi.quickcq.com:8900",
       socket: "",
       titleT: "",
+      selectRow: {},
       tableData: [],
       cur_page: 1,
       totalCount: 0,
       addVisible: false,
       configVisible: false,
+      smsVisible: false,
+      smsForm: {
+        content: ""
+      },
       ruleForm: {
         filter: "",
         area: "",
@@ -286,15 +318,16 @@ export default {
         emailAddresses: ""
       },
       configForm: {
-        yj1: "",
-        yj2: "",
-        jt: "",
-        bj: "",
-        sj: "",
-        language: "1",
-        sendmode: "1",
-        linkmode: "1",
-        psw: ""
+        serialNo: "",
+        emerPhone1: "",
+        emerPhone2: "",
+        listenPhone: "",
+        lowBatAlarm: 0,
+        timeInterval: 0,
+        displayLanguage: 1,
+        dataTransferMode: 1,
+        locationMode: 1,
+        connectMode: 10
       },
       deviceStatus: [
         { value: 1, displayText: "未绑定" },
@@ -321,7 +354,18 @@ export default {
       areas: [{ id: "", name: "" }],
       rules: {
         serialNo: [{ required: true, message: "必填", trigger: "blur" }]
-      }
+      },
+      rulesContent: {
+        content: [{ required: true, message: "必填", trigger: "blur" }]
+      },
+      configrules: {
+        lowBatAlarm: [{ required: true, message: "必填", trigger: "blur" }],
+        timeInterval: [{ required: true, message: "必填", trigger: "blur" }],
+        displayLanguage: [{ required: true, message: "请选择", trigger: "change" }],
+        dataTransferMode: [{ required: true, message: "请选择", trigger: "change" }],
+        locationMode: [{ required: true, message: "请选择", trigger: "change" }],
+        connectMode: [{ required: true, message: "请选择", trigger: "change" }],
+      },
     };
   },
   created() {
@@ -346,11 +390,15 @@ export default {
       if (!curVal) {
         this.$resetForm(this.$refs["creatOrEditForm"]);
       }
+    },
+    smsVisible(curVal) {
+      if (!curVal) {
+        this.$resetForm(this.$refs["contentForm"]);
+      }
     }
   },
   destroyed() {
     // 销毁监听
-    console.log('离开')
     this.socket.onclose = this.close;
   },
   methods: {
@@ -378,10 +426,11 @@ export default {
       console.log(msg.data);
     },
     send: function(params) {
-      console.log(params)
+      console.log(params);
       this.socket.send(params);
     },
     close: function() {
+      console.log("离开");
       console.log("socket已经关闭");
     },
     // 表格排序
@@ -397,7 +446,7 @@ export default {
     },
     formatTableDate(row, column) {
       if (row[column.property] !== null) {
-        return changeDate(row[column.property]);
+        return changeDateTime(row[column.property]);
       }
     },
     handleSizeChange(val) {
@@ -418,6 +467,39 @@ export default {
         }
       });
     },
+    EditConfig(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.updateParameters();
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
+    async updateParameters() {
+      try {
+        const res = await Put(`/api/device/${this.id}/parameters` , this.configForm);
+        if (res) {
+          this.$message.success('操作成功');
+          this.configVisible = false;
+          console.log(res);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    sendSms(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          let instruction = `MSG ${this.selectRow.serialNo}#${this.smsForm.content}`;
+          this.send(instruction);
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
     // 获取列表数据
     async getData() {
       this.ruleForm.skipCount =
@@ -432,11 +514,19 @@ export default {
         console.log(e);
       }
     },
-    handleConfig() {
+    async handleConfig(title) {
       this.configVisible = true;
+      try {
+        const res = await Get(`/api/device/${this.id}/parameters`);
+        if (res) {
+          this.configForm = res;
+        }
+      } catch (e) {
+        console.log(e);
+      }
     },
     handleActive() {
-      this.$confirm("确认激活该设备？", "提示", {
+      this.$confirm("确认激活此设备？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
@@ -446,13 +536,35 @@ export default {
         })
         .catch(() => {});
     },
+    handleMsg() {
+      if (this.selectRow.onlineStatus == 2) {
+        this.$message.warning("设备已离线");
+        return;
+      }
+      this.smsVisible = true;
+    },
+    handleDevice(action, code) {
+      if (this.selectRow.onlineStatus == 2) {
+        this.$message.warning("设备已离线");
+        return;
+      }
+      this.$confirm(`确认${action}此设备？`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          let instruction = `CTRL ${this.selectRow.serialNo}#${code}#00`;
+          console.log(instruction);
+        })
+        .catch(() => {});
+    },
     async ActiveDevice() {
       try {
         const res = await Put(Api.ActiveDevice + this.id);
         this.$message.success("激活成功");
         this.getData();
       } catch (e) {
-        // this.$message.error("删除失败");
         console.log(e);
       }
     },
@@ -526,9 +638,6 @@ export default {
       } catch (e) {
         console.log(e);
       }
-    },
-    isonline(data) {
-      return data.onlineStatus == 1 ? "在线" : "离线";
     }
   }
 };
@@ -575,5 +684,8 @@ export default {
 .del-dialog-cnt {
   font-size: 16px;
   text-align: center;
+}
+.chongdian {
+  font-size: 23px;
 }
 </style>

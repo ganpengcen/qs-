@@ -14,8 +14,8 @@ import router from '@/router/index'
 
 // 创建axios实例
 const service = axios.create({
-    baseURL: process.env.BASE_API + "/api", // api的base_url 开发模式
-    //baseURL: config.Host , // 线上
+     baseURL: process.env.BASE_API + "/api", // api的base_url 开发模式
+   // baseURL: config.Host , // 线上
     timeout: 20000 // 请求超时时间
 })
 let loading        //定义loading变量

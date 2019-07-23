@@ -8,7 +8,7 @@
       <div class="handle-box">
         <el-select
           style="width:230px"
-          v-model="areaId"
+          v-model="form.areaId"
           placeholder="请选择区域"
           clearable
           @change="GetPersonByArea()"
@@ -17,9 +17,10 @@
         </el-select>
         <el-select
           style="width:230px"
-          v-show="areaId"
+          v-show="form.areaId"
           v-model="form.entityName"
           placeholder="请选择监控对象"
+          @change="GetLocationPoints()"
           clearable
         >
           <el-option
@@ -29,7 +30,7 @@
             :value="item.deviceNo"
           ></el-option>
         </el-select>
-        <el-button type="primary" icon="search" @click="TrackingTime()">查询</el-button>
+        <el-button type="primary" icon="search" @click="GetLocationPoints()">查询</el-button>
       </div>
       <div class="mapbox">
         <!-- 地图 -->
@@ -55,19 +56,18 @@ export default {
       areas: [],
       personList: [],
       areaId: "",
+      optbox:0,
       pickerOptions2: DatePicker,
       form: {
-        transportMode:"walking",
-        entityName: "",
-        trackDate: new Date(),
-        isProcessed: false
+        areaId: "",
+        entityName: ""
       },
       vehicles: [],
       vehiclesArr: [],
       date: "", //日期
       opts: {
         width: 200, // 信息窗口宽度
-        height: 105, // 信息窗口高度
+        height: 130, // 信息窗口高度
         title: "查看人员最新位置", // 信息窗口标题
         enableMessage: true //设置允许信息窗发送短息
       },
@@ -78,8 +78,7 @@ export default {
       isActive: -1
     };
   },
-  watch: {
-  },
+  watch: {},
   created() {
     this.hh();
     this.GetAllArea();
@@ -108,8 +107,9 @@ export default {
     async GetPersonByArea() {
       this.form.entityName = "";
       try {
-        const res = await Get(Api.GetPersonByArea + this.areaId);
+        const res = await Get(Api.GetPersonByArea + this.form.areaId);
         this.personList = res;
+        this.GetLocationPoints()
       } catch (e) {
         console.log(e);
       }
@@ -127,8 +127,13 @@ export default {
       map.centerAndZoom(point, 15);
       map.enableScrollWheelZoom(); //启用滚轮放大缩小
     },
-     addMarker(p, data) {
-      var marker = new BMap.Marker(p);
+    addMarker(p, data) {
+      var myIcon = new BMap.Icon(
+        "static/img/icon_person.png",
+        new BMap.Size(20, 47),
+        {}
+      );
+      var marker = new BMap.Marker(p, { icon: myIcon });
       marker.addEventListener("click", e => {
         this.openInfo(data, p);
       });
@@ -139,35 +144,32 @@ export default {
       var geoc = new BMap.Geocoder();
       geoc.getLocation(p, rs => {
         var contentInfo =
-          '<div style="margin:0;font-size:13px;line-height:20px;padding:2px;">方向：' +
-          content.direction_desc +
-          "<br/>地址：" +
-          rs.address +
+          '<div style="margin:0;font-size:13px;line-height:20px;padding:2px;">姓名：<span style="font-weight:800">' +
+          content.userName  +
+          "</span><br/>地址：" +
+          content.latestAddress +
           "<br/>时间：" +
-          content.loc_time_desc +
+          changeDateTime(content.requestDateTime) +
           "</div>";
         var infoWindow = new BMap.InfoWindow(contentInfo, this.opts); // 创建信息窗口对象
         this.maps.openInfoWindow(infoWindow, p); //开启信息窗口
       });
     },
-    async TrackingTime() {
+    async GetLocationPoints() {
       let map = this.maps;
       this.maps.clearOverlays(); //清除点
       try {
-        const res = await Post(Api.TrackingTime, this.form);
-          if (res) {
-            var pointArr = [];
-            var datas = res.latest_point;
-            // for (var i = 0; i < datas.length; i++) {
-            //   var p = new BMap.Point(datas[i].longitude, datas[i].latitude);
-            //   pointArr.push(p);
-            //   this.addMarker(p, datas[i]);
-            // }
-               var p = new BMap.Point(datas.longitude, datas.latitude);
-              pointArr.push(p);
-              this.addMarker(p, datas);
-            this.maps.setViewport(pointArr);
+        const res = await Post(Api.GetLocationPoints, this.form);
+        if (res) {
+          var pointArr = [];
+          var datas = res;
+          for (var i = 0; i < datas.length; i++) {
+            var p = new BMap.Point(datas[i].baiduLng, datas[i].baiduLat);
+            pointArr.push(p);
+            this.addMarker(p, datas[i]);
           }
+          this.maps.setViewport(pointArr);
+        }
       } catch (e) {
         console.log(e);
       }
@@ -291,5 +293,4 @@ export default {
 .trackingmap {
   width: 100%;
 }
-
 </style>

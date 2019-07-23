@@ -72,6 +72,7 @@ export default {
 	Device:'/api/device/',
 	GetDevice:'/api/device/list/',
 	ActiveDevice:'/api/device/active/',
+	
 
 	//----------------------------区域管理-----------------------------------
 	GetAreaList:'/api/area/list',
@@ -91,7 +92,9 @@ export default {
 
 	//----------------------------轨迹-----------------------------------
 	TrackingLine:'/api/tracking/line',
-	TrackingTime:'/api/tracking/time',
+
+	//----------------------------实时位置-----------------------------------
+	GetLocationPoints:'/api/location/points',
 
 	//----------------------------监管人员管理-----------------------------------
 	GetPersonList:'/api/person/list',

@@ -368,13 +368,13 @@ export default {
 .mapbox {
   margin-top: 20px;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
 }
 .trackingmap {
-  width: 55%;
+  width: 71%;
 }
 .gpsinfo {
-  width: 40%;
+  width: 27%;
 }
 .basebox {
   display: flex;

@@ -85,69 +85,6 @@ export default {
           title: "",
           content: ""
         }
-      },
-      info: {
-        sEcho: "1",
-        iTotalRecords: 7,
-        totalCount: 7,
-        items: [
-          {
-            Id: "fea5d6ce-bbe4-4e68-b976-d9afd297c803",
-            Name: "圆形围栏3",
-            FenceType: 1,
-            FenceId: 7,
-            EntityName: "861510030457192",
-            DateAdded: "/Date(1502954306930)/"
-          },
-          {
-            Id: "0b34a211-b09f-4a5d-908a-0e4e3363444c",
-            Name: "线形围栏测试",
-            FenceType: 3,
-            FenceId: 3,
-            EntityName: "861510030457192",
-            DateAdded: "/Date(1502941453307)/"
-          },
-          {
-            Id: "1749fd47-de46-41ac-804c-553700754ea4",
-            Name: "全体设备围栏",
-            FenceType: 4,
-            FenceId: 9,
-            EntityName: "#allentity",
-            DateAdded: "/Date(1502978220510)/"
-          },
-          {
-            Id: "3d4c7da9-ff6a-4946-a471-ca710852866b",
-            Name: "芦庄围栏",
-            FenceType: 1,
-            FenceId: 14,
-            EntityName: "861510030457192",
-            DateAdded: "/Date(1503810422043)/"
-          },
-          {
-            Id: "cb8079c8-2f28-44a3-be6c-d2aa1a9a7ee1",
-            Name: "多边形围栏",
-            FenceType: 2,
-            FenceId: 6,
-            EntityName: "861510030457192",
-            DateAdded: "/Date(1502954087447)/"
-          },
-          {
-            Id: "cbb18bf3-67b0-4cf9-92f6-defd1c1713b2",
-            Name: "测试围栏报警（缘溪道）",
-            FenceType: 1,
-            FenceId: 10,
-            EntityName: "861510030457192",
-            DateAdded: "/Date(1503809687837)/"
-          },
-          {
-            Id: "32de873c-81b6-4fbb-8205-3dbc9ee9cb14",
-            Name: "滨湖区围栏",
-            FenceType: 4,
-            FenceId: 8,
-            EntityName: "861510030457192",
-            DateAdded: "/Date(1502955712807)/"
-          }
-        ]
       }
     };
   },

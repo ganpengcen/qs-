@@ -38,6 +38,13 @@
           </el-table-column>
           <el-table-column prop="personName" label="人员" min-width="120px" sortable='custom'>
           </el-table-column>
+          <el-table-column prop="serialNo" label="设备号" min-width="140px" sortable='custom'>
+          </el-table-column>
+          <el-table-column prop="type" label="警报类型" min-width="140px" sortable="custom">
+            <template slot-scope="scope">
+              <p>{{alarmType[scope.row.type]}}</p>
+            </template>
+          </el-table-column>
           <el-table-column prop="longitude" label="经度" min-width="100px" sortable='custom'>
           </el-table-column>
           <el-table-column prop="latitude" label="纬度" min-width="100px"  sortable='custom'>
@@ -47,6 +54,11 @@
           <el-table-column prop="address" label="地址"  min-width="110px"  sortable='custom'>
           </el-table-column>
           <el-table-column prop="processed" label="是否处理"  min-width="110px"  sortable='custom'>
+            <template slot-scope="scope">
+              <p
+                :class="[{'text-danger':!scope.row.processed},{'text-safe':scope.row.processed}]"
+              >{{scope.row.processed?'已处理':'未处理'}}</p>
+            </template>
           </el-table-column>
           <el-table-column prop="locTime" :formatter="formatTableDate" label="时间" sortable='custom' width="140px">
           </el-table-column>
@@ -68,9 +80,6 @@
         </el-form-item>
         <el-form-item label="纬度" prop="latitude">
           <el-input v-model="editForm.latitude"></el-input>
-        </el-form-item>
-        <el-form-item label="范围" prop="radius">
-          <el-input v-model="editForm.radius"></el-input>
         </el-form-item>
         <el-form-item label="地址" prop="address">
           <el-input v-model="editForm.address"></el-input>
@@ -123,8 +132,14 @@ export default {
         alarmType: ""
       },
       id: "",
-      editForm: {
-       
+      editForm: {  
+      },
+      alarmType:{
+        "1": "断带报警",
+        "2": "低电报警",
+        "3": "断带报警,低电报警",
+        "4": "出围栏",
+        "5": "入围栏"
       },
       processForm:{
        processResult:''
