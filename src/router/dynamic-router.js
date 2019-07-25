@@ -12,14 +12,14 @@ const dynamicRoutes = [
     },
     {
         path: 'bigDatas',
-        name: 'big-data',
-        component: resolve => require(['page/big-data-manage/dashboard'], resolve),
+        name: 'bigdata',
+        component: resolve => require(['page/dashboard-manage/dashboard'], resolve),
         meta: {
-            title: '大数据展示',
+            title: '监控台',
             icon: "icon-xs-dashuju",     
-        }
+        },  
     },
-    
+
     {
         path: '/system',
         component: resolve => require(['page/system-manage'], resolve),
@@ -29,15 +29,6 @@ const dynamicRoutes = [
             icon: 'icon-xs-xitong'
         },
         children: [
-            {
-                path: 'organizationUnits',
-                name: 'p-organizationUnits',
-                component: resolve => require(['page/system-manage/organizationUnits'], resolve),
-                meta: {
-                    title: '组织架构单元',
-                    // icon: 'icon-xs-sitemap'                  
-                }
-            },
             {
                 path: 'roles',
                 name: 'p-roles',
@@ -53,6 +44,7 @@ const dynamicRoutes = [
                 component: resolve => require(['page/system-manage/users'], resolve),
                 meta: {
                     title: '用户',
+                     
                     // icon: 'icon-xs-users'                 
                 }
             }            
@@ -65,6 +57,7 @@ const dynamicRoutes = [
         name: 'basicData',
         meta: {
             title: '基础数据',
+             
             icon: 'icon-xs-shuju'
         },
         children: [
@@ -74,6 +67,7 @@ const dynamicRoutes = [
                 component: resolve => require(['page/data-manage/dicData'], resolve),
                 meta: {
                     title: '字典数据',
+                     
                     // icon: 'icon-xs-book'                 
                 }
             }
@@ -87,6 +81,7 @@ const dynamicRoutes = [
         name: 'device',
         meta: {
             title: '设备管理',
+             
             icon: 'icon-xs-xitong'
         },
         children: [
@@ -96,6 +91,7 @@ const dynamicRoutes = [
                 component: resolve => require(['page/device-manage/deviceList'], resolve),
                 meta: {
                     title: '设备列表',
+                     
                 }
             },
             
@@ -107,6 +103,7 @@ const dynamicRoutes = [
         name: 'area',
         meta: {
             title: '区域管理',
+             
             icon: 'icon-xs-quyuguanli'
         },
         children: [
@@ -116,6 +113,7 @@ const dynamicRoutes = [
                 component: resolve => require(['page/area-manage/areaList'], resolve),
                 meta: {
                     title: '区域列表',
+                     
                 }
             },
             {
@@ -124,6 +122,7 @@ const dynamicRoutes = [
                 component: resolve => require(['page/area-manage/AreaAdmin'], resolve),
                 meta: {
                     title: '区域管理员',
+                     
                 }
             },
             
@@ -135,6 +134,7 @@ const dynamicRoutes = [
         name: 'MonitoredPerson',
         meta: {
             title: '人员管理',
+             
             icon: 'icon-xs-peoples'
         },
         children: [
@@ -144,6 +144,7 @@ const dynamicRoutes = [
                 component: resolve => require(['page/monitored-person-manage/MonitoredPersonList'], resolve),
                 meta: {
                     title: '人员列表',
+                     
                 }
             },
             {
@@ -152,6 +153,7 @@ const dynamicRoutes = [
                 component: resolve => require(['page/monitored-person-manage/location'], resolve),
                 meta: {
                     title: '人员定位',
+                     
                 }
             },
             {
@@ -160,6 +162,7 @@ const dynamicRoutes = [
                 component: resolve => require(['page/monitored-person-manage/gpsTracking'], resolve),
                 meta: {
                     title: '行为轨迹',
+                     
                 }
             },
             
@@ -171,6 +174,7 @@ const dynamicRoutes = [
         name: 'business',
         meta: {
             title: '业务管理',
+             
             icon: 'icon-xs-taiyang'
         },
         children: [
@@ -180,6 +184,7 @@ const dynamicRoutes = [
                 component: resolve => require(['page/business-manage/alarm'], resolve),
                 meta: {
                     title: '警报',
+                     
                 }
             },
             {
@@ -188,6 +193,7 @@ const dynamicRoutes = [
                 component: resolve => require(['page/business-manage/leave'], resolve),
                 meta: {
                     title: '请假管理',
+                     
                 }
             },
             {
@@ -196,6 +202,7 @@ const dynamicRoutes = [
                 component: resolve => require(['page/business-manage/InterviewRecord'], resolve),
                 meta: {
                     title: '面谈记录',
+                     
                 }
             },
             {
@@ -204,6 +211,7 @@ const dynamicRoutes = [
                 component: resolve => require(['page/business-manage/StudyRecord'], resolve),
                 meta: {
                     title: '教育学习',
+                     
                 }
             },
             {
@@ -212,6 +220,7 @@ const dynamicRoutes = [
                 component: resolve => require(['page/business-manage/ServiceRecord'], resolve),
                 meta: {
                     title: '社区服务',
+                     
                 }
             },
             
@@ -223,6 +232,7 @@ const dynamicRoutes = [
         name: 'geoFence',
         meta: {
             title: '地理围栏管理',
+             
             icon: 'icon-xs-liebiao'
         },
         children: [
@@ -232,6 +242,7 @@ const dynamicRoutes = [
                 component: resolve => require(['page/geoFence-manage/fencing'], resolve),
                 meta: {
                     title: '创建围栏',
+                     
                 }
             },
             {
@@ -240,6 +251,7 @@ const dynamicRoutes = [
                 component: resolve => require(['page/geoFence-manage/list-item'], resolve),
                 meta: {
                     title: '围栏列表',
+                     
                 }
             },
             

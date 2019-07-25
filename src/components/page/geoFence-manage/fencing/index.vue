@@ -73,7 +73,7 @@
             <el-input v-model="form.radius" placeholder="0-5000米" disabled></el-input>
           </el-form-item>
           <el-form-item label="行政区域" v-show="form.fenceType==4">
-            <el-input v-model="form.district" @keyup.enter.native="getBoundary(form.district)"></el-input>
+            <el-input v-model="form.district" @blur="getBoundary(form.district)"></el-input>
           </el-form-item>
           <el-form-item label="偏移距离" v-show="form.fenceType==3">
             <el-input-number v-model="form.offset" :min="0" label></el-input-number>

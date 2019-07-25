@@ -8,7 +8,7 @@
     <!--表格-->
     <div class="container">
       <div class="handle-box">
-        <el-date-picker v-model="dateArr" type="daterange" align="right" unlink-panels range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" :picker-options="pickerOptions2">
+        <el-date-picker v-model="dateArr" type="daterange" :default-time="['00:00:00', '23:59:59']" align="right" unlink-panels range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" :picker-options="pickerOptions2">
         </el-date-picker>
         <el-input v-model="ruleForm.name" placeholder="检索姓名" class="handle-input" @keyup.enter.native="getData"></el-input>
         <el-select v-model="ruleForm.areaId" placeholder="请选择区域" clearable @change="getData()" v-has="'Pages.XiangYang.ServiceRecord.SearchArea'">
@@ -64,7 +64,7 @@
           </el-table-column>
           <el-table-column prop="photoTime" :formatter="formatTableDate" label="拍照时间" sortable='custom' width="140px">
           </el-table-column>
-          <el-table-column prop="creationTime" :formatter="formatTableDate" label="创建时间" sortable='custom' width="140px">
+          <el-table-column prop="dateAdded" :formatter="formatTableDate" label="创建时间" sortable='custom' width="140px">
           </el-table-column>
         </el-table>
       </div>
@@ -81,9 +81,6 @@
       <el-form ref="editrForm" :model="editForm" :rules="rules">
         <el-form-item label="服务时长(分钟)" prop="studyTime">
           <el-input v-model="editForm.studyTime"></el-input>
-        </el-form-item>
-        <el-form-item label="组织者/见证者" prop="orgization">
-          <el-input v-model="editForm.orgization"></el-input>
         </el-form-item>
        <el-form-item label="活动内容" prop="content">
           <el-input type="textarea" v-model="editForm.content"></el-input>
@@ -127,7 +124,6 @@ export default {
       rules: {
         studyTime: [{ required: true, message: "必填", trigger: "blur" }],
         content: [{ required: true, message: "必填", trigger: "blur" }],
-        orgization: [{ required: true, message: "必填", trigger: "blur" }],
       },
     
       titleT1: "",
@@ -258,14 +254,10 @@ export default {
     },
     async UpdateServiceRecord() {
       try {
-        let url =
-          "/api/services/app/serviceRecord/UpdateServiceRecord";
-        const res = await Post(url, this.editForm);
-        if (res) {
+        const res = await Put(Api.ServiceRecord + this.id, this.editForm);
           this.getData();
-          this.$message("修改成功");
-          this.EditVisible = false;
-        }
+          this.$message.success("修改成功");
+          this.EditVisible = false;     
       } catch (e) {
         console.log(e);
       }
@@ -344,7 +336,7 @@ export default {
 }
 
 .handle-input {
-  width: 350px;
+  width: 250px;
   display: inline-block;
 }
 .del-dialog-cnt {

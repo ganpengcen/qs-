@@ -15,11 +15,20 @@ import { clearValidate,resetForm } from "@/utils/config";
 import Blob from './excel/Blob.js'
 import Export2Excel from './excel/Export2Excel.js'
 import animated from 'animate.css'
+import '../static/css/my.css'
+import '../static/font/iconfont.css';
+
+
 
 // import '../static/ueditor/ueditor.config.js'
 // import '../static/ueditor/ueditor.all.js'
 import '../static/ueditor/lang/zh-cn/zh-cn.js'
 import '../static/ueditor/ueditor.parse.min.js'
+
+import NavHeader from '@/components/common/NavHeader.vue'
+Vue.component('nav-header', NavHeader)
+
+
 Vue.prototype.$clearValidate = clearValidate
 Vue.prototype.$resetForm = resetForm
 Vue.prototype.$echarts = echarts

@@ -28,7 +28,6 @@ export const DynamicRoutes = [
             title: '自述文件'
         },
         children: [
-            
         ]
     },
     {

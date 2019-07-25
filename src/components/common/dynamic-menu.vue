@@ -9,7 +9,7 @@
         </template>
         <el-menu-item-group>
           <!-- 二级子 -->
-          <my-nav :menuList="v.children"></my-nav>
+          <my-nav  :menuList="v.children"></my-nav>
         </el-menu-item-group>
       </el-submenu>
       <!-- 不含二级一级 -->
@@ -39,9 +39,9 @@ export default {
   },
   methods: {
     gotoRoute(name) {
-      if (name == "big-data") {
+      if (name == "bigdata") {
       //  window.location.href = "http://121.41.73.6:808/"
-      this.$router.push('/bigData')
+      this.$router.push('/bigData/TablesOne')
       }  else {
         router.push({ name });
       }               

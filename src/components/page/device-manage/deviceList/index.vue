@@ -255,8 +255,8 @@
           <el-radio v-model="configForm.locationMode" :label="6">省电模式</el-radio>
         </el-form-item>
         <el-form-item label="终端连接模式" prop="connectMode">
-          <el-radio v-model="configForm.connectMode" :label="10">短连接</el-radio>
-          <el-radio v-model="configForm.connectMode" :label="20">长连接</el-radio>
+          <el-radio v-model="configForm.connectMode" :label="16">短连接</el-radio>
+          <el-radio v-model="configForm.connectMode" :label="32">长连接</el-radio>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">

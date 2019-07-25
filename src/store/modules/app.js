@@ -6,9 +6,13 @@ const app = {
       opened: !+Cookies.get('sidebarStatus'),
       withoutAnimation: false
     },
+    fullScreenState: false, // 全屏状态
     device: 'desktop'
   },
   mutations: {
+    changeFull(state, data) {
+      state.fullScreenState = data
+    },
     TOGGLE_SIDEBAR: state => {
       if (state.sidebar.opened) {
         Cookies.set('sidebarStatus', 1)

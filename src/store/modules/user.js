@@ -82,7 +82,7 @@ const user = {
     },
     // 获取路由数据
     async FetchPermission({ commit, state }) {
-      let res = { "result": [{ "title": "工作台", "childs": [] }, { "title": "大数据展示", "childs": [] }, { "title": "管理", "childs": [{ "title": "角色", "childs": [] }, { "title": "用户", "childs": [] }, { "title": "语言列表", "childs": [] }, { "title": "审计日志", "childs": [] }, { "title": "维护", "childs": [] }] }, { "title": "基础数据", "childs": [{ "title": "字典数据", "childs": [] }] }, { "title": "设备管理", "childs": [{ "title": "设备列表", "childs": [] }] }, { "title": "区域管理", "childs": [{ "title": "区域列表", "childs": [] },{ "title": "区域管理员", "childs": [] }] }, { "title": "人员管理", "childs": [{ "title": "人员列表", "childs": [] },{ "title": "人员定位", "childs": [] },{ "title": "行为轨迹", "childs": [] }] }, { "title": "业务管理", "childs": [{ "title": "警报", "childs": [] }, { "title": "请假管理", "childs": [] },{ "title": "面谈记录", "childs": [] },{ "title": "教育学习", "childs": [] }, { "title": "社区服务", "childs": [] }] }, { "title": "地理围栏管理", "childs": [{ "title": "创建围栏", "childs": [] }, { "title": "围栏列表", "childs": [] }] }], "targetUrl": null, "success": true, "error": null, "unAuthorizedRequest": false, "__abp": true }
+      let res = { "result": [ { "title": "工作台", "childs": [] },{ "title": "监控台", "childs": [] }, { "title": "管理", "childs": [{ "title": "角色", "childs": [] }, { "title": "用户", "childs": [] }, { "title": "语言列表", "childs": [] }, { "title": "审计日志", "childs": [] }, { "title": "维护", "childs": [] }] }, { "title": "基础数据", "childs": [{ "title": "字典数据", "childs": [] }] }, { "title": "设备管理", "childs": [{ "title": "设备列表", "childs": [] }] }, { "title": "区域管理", "childs": [{ "title": "区域列表", "childs": [] },{ "title": "区域管理员", "childs": [] }] }, { "title": "人员管理", "childs": [{ "title": "人员列表", "childs": [] },{ "title": "人员定位", "childs": [] },{ "title": "行为轨迹", "childs": [] }] }, { "title": "业务管理", "childs": [{ "title": "警报", "childs": [] }, { "title": "请假管理", "childs": [] },{ "title": "面谈记录", "childs": [] },{ "title": "教育学习", "childs": [] }, { "title": "社区服务", "childs": [] }] }, { "title": "地理围栏管理", "childs": [{ "title": "创建围栏", "childs": [] }, { "title": "围栏列表", "childs": [] }] }], "targetUrl": null, "success": true, "error": null, "unAuthorizedRequest": false, "__abp": true }
       let url = "/api/menu/getMenuPages";
       // const res = await Post(url, {});
       if (res.success) {
@@ -97,21 +97,39 @@ const user = {
           /*  根据后台权限跟定义好的权限对比，筛选出对应的路由并加入到path=''的children */
           let routes = recursionRouter(permissionList, dynamicRoutes)
           for (let i = 0; i < routes.length; i++) {
-            if (routes[i].name === 'big-data') {
+            if (routes[i].name === 'bigdata') {
               let arr = [{
                 path: '/bigData',
-                component: resolve => require(['page/big-data-manage/dashboard'], resolve),
+                component: resolve => require(['page/dashboard-manage/dashboard'], resolve),
+                children: [{
+                  path: '/bigData/TablesOne',
+                  name: 'TablesOne',
+                  component: resolve => void(require(['page/dashboard-manage/TablesOne.vue'], resolve)),
+                },
+                {
+                  path: '/bigData/Tables',
+                  name: 'Tables',
+                  component: resolve => void(require(['page/dashboard-manage/Tables.vue'], resolve)),
+                },  
+              ],
+              redirect: '/bigData/TablesOne'
               },
-              //大数据 法律咨询
               {
-                path: '/pageTwo',
-                component: resolve => void (require(['page/big-data-manage/pageTwo'], resolve)),
+                path: '/Correct',
+                name: 'Correct',
+                component: resolve => void(require(['page/dashboard-manage/Correct.vue'], resolve)),
+              }, 
+              {
+                path: '/Onlinelearning',
+                name: 'Onlinelearning',
+                component: resolve => void(require(['page/dashboard-manage/Onlinelearning.vue'], resolve)),
+              },   
+              {
+                path: '/Learningtime',
+                name: 'Learningtime',
+                component: resolve => void(require(['page/dashboard-manage/Learningtime.vue'], resolve)),
               },
-              //大数据 社区矫正
-              {
-                path: '/pageThree',
-                component: resolve => void (require(['page/big-data-manage/pageThree'], resolve)),
-              }]
+             ]
               DynamicRoutes.push(...arr);
             }
           }
@@ -138,6 +156,7 @@ const user = {
             children.unshift(welcome);
           }
 
+          console.log(children)
           /* 生成左侧导航菜单 */
           commit('SET_MENU', children)
 
