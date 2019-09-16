@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+<form name='test'>
+    <input type="file" name='file'>
+    <input type="submit" value="提交">
+</form>
+<canvas width="200" height="200"></canvas>
+<script>
+    var canvas = document.querySelector('canvas'),
+        ctx = canvas.getContext('2d'),
+        preview = new Image();
+    document.test.file.addEventListener('change', function() {
+        var fr = new FileReader();
+        fr.onload = function() {
+            preview.src = this.result;
+            canvas.width = preview.width;
+            canvas.height = preview.height;
+            drawImage();
+        };
+        fr.readAsDataURL(this.files[0]);
+    })
+    function drawImage() {
+        ctx.drawImage(preview, 0, 0); //把图片绘制到canvas上
+    }
+    document.test.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var formData = new FormData(),
+            xhr = new XMLHttpRequest(),
+            mime = 'image/jpeg',
+            dataUrl = canvas.toDataURL(mime, 0.8),  //取出base64
+            data = atob(dataUrl.split(',')[1]),
+            n = data.length,
+            uInt8 = new Uint8Array(n),
+            blob;
+        while(n--) {
+            uInt8[n] = data.charCodeAt(n);
+        }
+        blob = new Blob([uInt8.buffer], {type: mime});
+        formData.append('file', blob, 'test.jpg');
+        xhr.open('post', '/upload');
+        xhr.send(formData);
+    })
+</script>
+</body>
+</html>

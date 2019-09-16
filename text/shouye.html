@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+</head>
+<style type="text/css">
+    *{
+        margin: 0;
+        padding: 0;
+        list-style-type:none;
+        text-decoration: none;
+    }
+    .head{
+        width: 100%;
+        height: 700px;
+        margin-bottom:68px;
+    }
+    .contain1{
+        width: 1280px;
+        height: 100px;
+        margin:0 auto;
+    }
+    .logo1{
+        margin-top: 36px;
+        margin-left: 225px;
+    }
+    .head .contain1 .nav{
+        width: 800px;
+        height: 100px;
+        float: right;
+    }
+    .head .contain1 ul{
+        width: 800px;
+        height: 100px;
+        text-align: center;
+        line-height: 100px;
+    }
+    .head .contain1 ul li{
+        display: inline-block;
+        margin-right: 30px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    .head #container {
+        width: 100%;
+        height: 600px;
+        /*overflow: hidden;*/
+    }
+    .head .sections,.section4 {
+        height:100%;
+    }
+    .head #container,.sections {
+        position: relative;
+    }
+    .section4 {
+        /*background-color: #000;*/
+        background-size: cover;
+        background-position: 50% 50%;
+        text-align: center;
+        color: white;
+    }
+    section{
+        width: 100%;
+        height: 3878px;
+    }
+    section .hb{
+        width: 1280px;
+        height:362px;
+        margin:0 auto;
+        margin-bottom: 68px;
+    }
+    section .hb .hb_left{
+        width: 220px;
+        height: 360px;
+        margin-right: 20px;
+        display: inline-block;
+        position: relative;
+        left: 225px;
+        top:-127px;
+    }
+    section .hb .hb_left img{
+         vertical-align: top;
+     }
+    section .hb .hb_left .hb_img1{
+          margin-left:8.7px;
+          margin-right: 8.5px;
+          display:inline-block;
+      }
+    section .hb .hb_left .hb_img5{
+        margin-left:34px;
+        margin-top: 18px;
+       }
+    section .hb .hb_right{
+        width:594px;
+        height: 360px;
+        display: inline-block;
+        position: relative;
+        left: 225px;
+    }
+    section .hb .hb_right .huanbao{
+        display:inline-block;
+        font-size:24px;
+        color:#333333;
+    }
+    section .hb .hb_right .ep{
+        font-size:14px;
+        margin-bottom: 15px;
+        margin-left: 10px;
+        color:#333333;
+        display:inline-block;
+    }
+    section .hb .hb_right .hb_img6{
+        margin-top:10px;
+    }
+    section .anli_t{
+        width: 840px;
+        height:693px;
+        padding-bottom:110px;
+        margin: 0 auto;
+    }
+    section .anli_t .title2{
+        display:inline-block;
+        font-size:24px;
+        color:#333333;
+    }
+    section .anli_t .bc{
+        font-size:14px;
+        margin-bottom: 15px;
+        margin-left: 10px;
+        display:inline-block;
+        color:#333333;
+    }
+    section .anli_t .anli_nr .cass{
+         width: 140px;
+         height: 260px;
+         display: inline-block;
+         margin-right: 15px;
+        text-align: center;
+     }
+    section .anli_t .anli_nr .cass4{
+        width:356px;
+        height: 260px;
+        display: inline-block;
+    }
+    section .anli_t .anli_nr .xian{
+        background-color:#8a8a8a;
+        height: 1px;
+        width: 840px;
+        margin-top: 33px;
+        margin-bottom: 50px;
+    }
+    section .anli_t .anli_nr .cass5{
+        width:538px;
+        height: 338px;
+        display: inline-block;
+    }
+    section .anli_t .anli_nr .text{
+        width:295px;
+        height: 338px;
+        display: inline-block;
+        text-align: right;
+        vertical-align:top;
+    }
+    section .anli_t .anli_nr .text1{
+        font-size: 20px;
+        color: #8a8a8a;
+    }
+    section .anli_t .anli_nr .text2{
+        font-size: 14px;
+        color: #333333;
+        margin-bottom: 10px;
+    }
+    section .anli_t .anli_nr .text_t{
+        color: #333333;
+        margin-top:86px;
+        margin-bottom:20px;
+    }
+    section .anli_t .anli_nr .text_e{
+        margin-bottom: 10px;
+    }
+    section .anli_t .anli_nr .text_c{
+        margin-bottom:20px;
+    }
+
+    section .anli_t .anli_nr .anli_img{
+        width: 140px;
+        height: 190px;
+    }
+    section .anli_t .anli_nr .fengge{
+        font-size:16px;
+        margin-top: 5px;
+        margin-bottom:5px;
+    }
+    section .anli_t .anli_nr .jieshao{
+        font-size:12px;
+    }
+    section .anli_b{
+        width: 1280px;
+        height:1416px;
+        margin:0 auto;
+    }
+    section .anli_b .anli_b1{
+        width: 1280px;
+        height: 448px;
+        margin-bottom: 36px;
+        background-color:#f5f5f5;
+    }
+    section .anli_b .anli_b1 .anli_b1_img{
+        display: inline-block;
+    }
+    section .anli_b .anli_b1 .anli_b1_t{
+        width:547px;
+        height: 448px;
+        background-color:#f5f5f5;
+        display: inline-block;
+        text-align: center;
+        vertical-align: top;
+    }
+    section .anli_b .anli_b1 .anli_b1_t_nr{
+        font-size:14px;
+        margin-bottom: 10px;
+    }
+    section .anli_b .anli_b2{
+        width: 1280px;
+        height: 448px;
+        margin-bottom: 36px;
+        background-color:#f5f5f5;
+    }
+    section .anli_b .anli_b2 .anli_b2_img{
+        display: inline-block;
+    }
+    section .anli_b .anli_b2 .anli_b2_t{
+        width:547px;
+        height: 448px;
+        background-color:#f5f5f5;
+        display: inline-block;
+        text-align: center;
+        vertical-align: top;
+    }
+    section .anli_b .anli_b2 .anli_b2_t_nr{
+        font-size:14px;
+        margin-bottom: 10px;
+    }
+    section .anli_b .anli_b3{
+        width: 1280px;
+        height: 448px;
+        margin-bottom: 36px;
+        background-color:#f5f5f5;
+    }
+    section .anli_b .anli_b3 .anli_b3_img{
+        display: inline-block;
+    }
+    section .anli_b .anli_b3 .anli_b3_t{
+        width:470px;
+        height: 448px;
+        background-color:#f5f5f5;
+        display: inline-block;
+        text-align: center;
+        vertical-align: top;
+    }
+    section .anli_b .anli_b3 .anli_b3_t_nr{
+        font-size:14px;
+        margin-bottom: 10px;
+    }
+    section .zixun{
+        width: 100%;
+        height: 830px;
+        background-color: #f5f5f5;
+        margin-top: 68px;
+    }
+    section .zixun .zixun_nr{
+        width:1280px;
+        height: 748px;
+        margin:0 auto;
+    }
+    section .zixun_nr .zixun_title{
+        width: 1280px;
+        height:93px;
+        padding-top: 35px;
+    }
+    section .zixun_nr .zixun_title .title{
+        display:inline-block;
+        font-size:24px;
+        color:#333333;
+    }
+    section .zixun_nr .new{
+        font-size:14px;
+        margin-bottom: 15px;
+        margin-left: 30px;
+        display:inline-block;
+        color:#333333;
+    }
+    section .zixun_nr .zixun_l{
+        width: 850px;
+        height: 580px;
+        display: inline-block;
+        margin-right: 25px;
+        padding: 20px;
+        vertical-align: top;
+        background-color:#fff;
+    }
+    section .zixun_nr .zixun_l .fengexian{
+        width: 850px;
+        height: 1px;
+        background-color: #333333;
+        margin-top: 15px;
+    }
+    section .zixun_nr .zixun_l .zx_t{
+        font-size:18px;
+        color:#333333;
+        border-bottom:1px solid #333333;
+        height: 35px;
+        width: 850px;
+    }
+    section .zixun_nr .zixun_l .fenge{
+        position: relative;
+        left: 0px;
+        top: -17px;
+    }
+    section .zixun_nr .zixun_l .zx .zxnr_1{
+        font-size:20px;
+        height: 35px;
+        width: 655px;
+        display: inline-block;
+        vertical-align: top;
+        margin-left: 5px;
+    }
+    section .zixun_nr .xuxian{
+        border:1px dashed #8a8a8a;
+        margin-top: 25px;
+        margin-bottom: 25px;
+    }
+    section .zixun_nr .zixun_r{
+        width: 360px;
+        height: 620px;
+        display: inline-block;
+        box-sizing: border-box;
+        padding: 20px;
+        background-color:#fff;
+    }
+    section .zixun_nr .zixun_r .zx_t1{
+        font-size: 18px;
+        color: #333333;
+        border-bottom:1px solid #333333;
+        height: 35px;
+        width: 320px;
+    }
+    section .zixun_nr .zixun_r .fenge1{
+        position: relative;
+        left: 0px;
+        top: -17px;
+    }
+    section .zixun_nr .zixun_r .zx .zxnr_r{
+        font-size:18px;
+        height: 35px;
+        width: 130px;
+        display: inline-block;
+        vertical-align: top;
+        margin-left: 5px;
+        float: right;
+    }
+    section .zixun_nr .zixun_r .zixun_r_n{
+        font-size: 16px;
+        color: #8a8a8a;
+        height: 52px;
+        border-bottom:1px dashed #8a8a8a;
+        line-height: 52px;
+    }
+    section .shiming{
+        margin:0 auto;
+        width: 1280px;
+        height: 330px;
+        text-align: center;
+    }
+    section .shiming p{
+        height: 148px;
+        font-size:24px;
+        line-height:148px;
+    }
+    section .shiming ul{
+        width: 1280px;
+        height: 64px;
+        margin: auto;
+        line-height:64px;
+    }
+    section .shiming ul li{
+        display: inline-block;
+        margin-right:88px;
+    }
+    /*section .shiming ul li:hover{*/
+        /*color:#ff6537;*/
+        /*cursor: pointer;*/
+    /*}*/
+    section .shiming ul li:last-of-type{
+        margin-right: 0;
+    }
+    footer{
+          width: 100%;
+          height: 300px;
+          margin:0 auto;
+      }
+    footer .foot{
+        width: 1920px;
+        height: 489px;
+        margin:0 auto;
+        background-image: url("qietu/shouye/footer.png");
+    }
+    footer .foot ul{
+        width:88px;
+        height: 342px;
+        font-size:22px;
+        color: #FFFFFF;
+        position: relative;
+        left: 820px;
+        top: 92px;
+    }
+    footer .foot ul li{
+        margin-bottom: 34px;
+    }
+    /*footer .foot ul li:hover{*/
+        /*color:#ff6537;*/
+        /*cursor: pointer;*/
+    /*}*/
+</style>
+<body>
+<style>
+ .head .contain1 a:link{
+    color: red;
+    }
+</style>
+    <header class="head">
+        <div class="contain1">
+                <img src="qietu/shouye/logo.png" alt="" class="logo1">
+            <div class="nav">
+                <ul class="nav_ul" id="in2">
+                    <li><a href="" class="pp">首页</a> </li>
+                    <li><a href="xiangqingye.html">精品案例</a></li>
+                    <li><a href="">端定制</a></li>
+                    <li><a href=""> 设计团队</a></li>
+                    <li><a href="">资讯中心</a> </li>
+                    <li>品质服务</li>
+                </ul>
+            </div>
+        </div>
+        <div id="container">
+            <!--<div id="button" style="position: absolute;z-index: 99">-->
+                <!--<a href="" style="float: left">1</a>-->
+                <!--<a href="" style="float: right">2</a>-->
+            <!--</div>-->
+            <!--<div id="radio">-->
+                <!--<span></span>-->
+                <!--<span></span>-->
+                <!--<span></span>-->
+                <!--<span></span>-->
+            <!--</div>-->
+            <div class="sections" id="div1" style="z-index: 10;">
+                <div class="section4" id="section0"><img src="qietu/shouye/banner.png" alt="" width="90%"></div>
+                <div class="section4" id="section1" style="display: none"><img  width="90%" src="qietu/shouye/banner2.png" alt=""></div>
+                <div class="section4" id="section2" style="display: none"><img  width="90%" src="qietu/shouye/banner3.png" alt=""></div>
+                <div class="section4" id="section3" style="display: none"><img  width="90%" src="qietu/shouye/banner4.png" alt=""></div>
+            </div>
+        </div>
+    </header>
+    <section>
+        <div class="hb">
+            <div class="hb_left">
+                <img src="qietu/shouye/ENJOY.png" alt="" class="hb_img1">
+                <img src="qietu/shouye/huanbaojiazhuang1.png" alt="" class="hb_img2">
+                <img src="qietu/shouye/huanbaojiazhuang2.png" alt="" class="hb_img5">
+            </div>
+            <div class="hb_right">
+                <img src="qietu/shouye/sekuai1.png" alt="" class="hb_img3">
+                <span class="huanbao">环保家装</span>
+                <br>
+                <span class="ep">Environmental protection</span>
+                <br>
+                <span style="font-size:14px;color:#333333;">
+                    精选环保优质材料,保障健康安全
+                    <br>
+                    从毛坯到精装修一步到位,健康看得见
+                </span>
+                <br>
+                <img src="qietu/shouye/sekuai2.png" alt="" class="hb_img4">
+                <br>
+                <img src="qietu/shouye/huanbaojiazhuang3.png" alt="" class="hb_img6">
+            </div>
+        </div>
+        <div class="anli_t">
+            <div class="anli_title">
+                    <img src="qietu/shouye/sekuai1.png" alt="" class="anli_img1">
+                    <span class="title2">精品案例</span>
+                    <br>
+                    <span class="bc">Boutique case</span>
+            </div>
+            <div class="anli_nr">
+                <div class="cass1 cass">
+                    <img src="qietu/shouye/anli1.png" alt="" class="anli_img">
+                    <p class="fengge">
+                        <span>简约风格</span>
+                    </p>
+                    <p class="jieshao">
+                        <span>简约风格的特色是将</span>
+                    </p>
+                    <p>
+                        <span class="jieshao">设计的元素、色彩...</span>
+                    </p>
+                </div>
+                <div class="cass2 cass">
+                    <img src="qietu/shouye/anli2.png" alt="" class="anli_img">
+                    <p class="fengge">
+                        <span>美式风格</span>
+                    </p>
+                    <p class="jieshao">
+                        <span>结合中西方的文化特</span>
+                    </p>
+                    <p>
+                        <span class="jieshao">色，综合大众消费情...</span>
+                    </p>
+                </div>
+                <div class="cass3 cass">
+                    <img src="qietu/shouye/anli3.png" alt="" class="anli_img">
+                    <p class="fengge">
+                        <span>欧式风格</span>
+                    </p>
+                    <p class="jieshao">
+                        <span>简约欧式风格沿融入</span>
+                    </p>
+                    <p>
+                        <span class="jieshao">了现代的生活元素...</span>
+                    </p>
+                </div>
+                <div class="cass4">
+                    <img src="qietu/shouye/anli4.png" alt="">
+                </div>
+                <div class="xian"></div>
+                <div class="cass5">
+                    <img src="qietu/shouye/anli5.png" alt="">
+                </div>
+                <div class="text">
+                    <p style="color:#333333;" class="text1 text_t">
+                        <span>高雅混搭复式设计</span>
+                    </p>
+                    <p class="text1 text_e">
+                        <span>ELEGANT MIX</span>
+                    </p>
+                    <p class="text1 text_c">
+                        <span>COMPOUND DESIGN</span>
+                    </p>
+                    <p class="text2">
+                        <span>混搭风格释合东西方美学精华</span>
+                    </p>
+                    <p class="text2">
+                        <span>元素，将古今文化内涵完美的结合于一体</span>
+                    </p>
+                    <p class="text2 text_f">
+                        <span>充分利用有限的空间设计出更实用的布局</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="anli_b">
+            <div class="anli_b1">
+                <div class="anli_b1_img">
+                    <img src="qietu/shouye/img1.png" alt="">
+                </div>
+                <div class="anli_b1_t">
+                    <img src="qietu/shouye/shezhi.png" alt="" style="margin-top: 128px;margin-bottom: 24px;">
+                    <p style="font-size:20px;color: #333333;margin-bottom: 20px;">
+                        <span>系统化、集成化的陈列方式</span>
+                    </p>
+                    <p class="anli_b1_t_nr">
+                        <span>近1000㎡的展厅里，舒适智能家居的冷暖、新风、净水、智能新</span>
+                    </p>
+                    <p class="anli_b1_t_nr">
+                        <span>能源五大系统产品均有展出，品类非常齐全。每个系统都有对应</span>
+                    </p>
+                    <p class="anli_b1_t_nr">
+                        <span>的产品一目了然，非常方便我们选择产品</span>
+                    </p>
+                </div>
+            </div>
+            <div class="anli_b2">
+                <div class="anli_b2_t">
+                    <img src="qietu/shouye/dengpao.png" alt="" style="margin-top: 128px;margin-bottom: 24px;">
+                    <p style="font-size:20px;color: #333333;margin-bottom: 20px;">
+                        <span>智慧服务体系</span>
+                    </p>
+                    <p class="anli_b2_t_nr">
+                        <span>客户报出自家的户型和需求，就有设备自动给我们设计出方案而</span>
+                    </p>
+                    <p class="anli_b2_t_nr">
+                        <span>且价格一目了然，特别方便快捷，节省时间</span>
+                    </p>
+                </div>
+                <div class="anli_b2_img">
+                    <img src="qietu/shouye/img2.png" alt="">
+                </div>
+            </div>
+            <div class="anli_b3">
+                <div class="anli_b3_img">
+                    <img src="qietu/shouye/img3.png" alt="">
+                </div>
+                <div class="anli_b3_t">
+                    <img src="qietu/shouye/huahua.png" alt="" style="margin-top: 120px;margin-bottom: 24px;">
+                    <p style="font-size:20px;color: #333333;margin-bottom: 20px;">
+                        <span>多形式体验</span>
+                    </p>
+                    <p class="anli_b3_t_nr">
+                        <span>看房有样板间，在我们看产品也有样板间，老房样板间重点将明</span>
+                    </p>
+                    <p class="anli_b3_t_nr">
+                        <span>装采暖系统做了真实还原，而新房样板间舒适智能全系统工程的</span>
+                    </p>
+                    <p class="anli_b3_t_nr">
+                        <span>有讲解复原，样板间内对工程的主材、辅材以及冠道铺陈、零部</span>
+                    </p><p class="anli_b3_t_nr">
+                        <span>件都配...</span>
+                    </p>
+                </div>
+                <div class="anli_b3_img">
+                    <img src="qietu/shouye/img4.png" alt="">
+                </div>
+            </div>
+        </div>
+        <div class="zixun">
+            <div class="zixun_nr">
+                <div class="zixun_title">
+                    <img src="qietu/shouye/sekuai1.png" alt="">
+                    <span class="title">资讯中心</span>
+                    <br>
+                    <span class="new">NEWS</span>
+                </div>
+                <div class="zixun_l">
+                    <p class="zx_t">
+                        装修资讯
+                        <span style="float: right;">MORE</span>
+                    </p>
+                    <div class="fenge">
+                        <img src="qietu/shouye/fenge.png" alt="" style="width: 75px;height:3px;">
+                    </div>
+                    <div class="zx">
+                        <img src="qietu/shouye/zixun1.png" alt="">
+                        <p class="zxnr_1">
+                            <span style="float: right;">2018.10.19</span>
+                            装修经验：实用的家具选择妙招分享
+                            <br>
+
+                            <span style="font-size:14px;display: inline-block;margin-top: 10px;">
+                                在装修完成之后，选择家具是一个大问题，那么究竟要怎么才能买到合适的家具呢，有什么注意事项呢？下面我们带大家了解几点...
+                            </span>
+                        </p>
+                    </div>
+                    <div class="xuxian"></div>
+                    <div class="zx">
+                        <img src="qietu/shouye/zixun2.png" alt="">
+                        <p class="zxnr_1">
+                            <span style="float: right;">2018.10.19</span>
+                            如何正确的选择装修时间
+                            <br>
+
+                            <span style="font-size:14px;display: inline-block;margin-top: 10px;">
+                                我们都知道，装修也是有一个淡季和一个旺季的，那么，作为业主，是应该选择年后装修还是选择年前装修呢？ 一般来说，年底...
+                            </span>
+                        </p>
+                    </div>
+                    <div class="xuxian"></div>
+                    <div class="zx">
+                        <img src="qietu/shouye/zixun3.png" alt="">
+                        <p class="zxnr_1">
+                            <span style="float: right;">2018.10.19</span>
+                            家居装修如何选择卫浴产品
+                            <br>
+
+                            <span style="font-size:14px;display: inline-block;margin-top: 10px;">
+                                房屋装修除了要对装饰材料做到精心选择外，对室内家居的选择也不能掉以轻心，尤其是对卫生间卫浴的选择大有说头，下面随我...
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <div class="zixun_r">
+                    <p class="zx_t1">
+                        行内资讯
+                        <span style="float: right;">MORE</span>
+                    </p>
+                    <div class="fenge1">
+                        <img src="qietu/shouye/fenge.png" alt="" style="width: 75px;height:3px;">
+                    </div>
+                    <div class="zx">
+                        <img src="qietu/shouye/zixun4.png" alt="" style="width:184px;">
+                        <p class="zxnr_r">
+                            陈旧学区房改造
+                            <br>
+
+                            <span style="font-size:14px;display: inline-block;margin-top: 5px;">
+                                通常住宅面积为60-90m的房屋比较适合两室一厅的架构，这样的空间布局为合理和实用，适宜1-4人居住。许多人...
+
+                            </span>
+                        </p>
+                    </div>
+                    <p class="zixun_r_n">装修案例: 60~90m 精品案例设计</p>
+                    <p class="zixun_r_n">古典美式风格怀旧中带有浓浓的浪漫气息</p>
+                    <p class="zixun_r_n">装修经验:实用的家具选择妙招分享</p>
+                    <p class="zixun_r_n">50平米房间装修攻略:让狭小空间变井井有条</p>
+                    <p class="zixun_r_n">奢华欧式四居室浪漫与温馨的完美邂逅</p>
+                    <p class="zixun_r_n">现代简约四居室，追求多元化生活方式</p>
+
+                </div>
+            </div>
+
+        </div>
+        <div class="shiming">
+            <p>
+                "为大众节省装修费用，提供便捷服务，营造幸福之家"—我们的使命
+            </p>
+            <img src="qietu/shouye/xiao-icon.png" alt="">
+            <ul>
+                <li>物流发达</li>
+                <li>建材直供</li>
+                <li>自有工厂</li>
+                <li>工程0增项</li>
+                <li>工期承诺</li>
+                <li>品质保障</li>
+                <li>环保工程</li>
+                <li>多个代理</li>
+            </ul>
+        </div>
+    </section>
+    <div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';"></div>
+    <footer id="in">
+        <div class="foot">
+            <ul class="a">
+                <li><a href="##">首页</a></li>
+                <li><a href="##">精品案例</a></li>
+                <li>高端定制</li>
+                <li>设计团队</li>
+                <li>资讯中心</li>
+                <li>品质服务</li>
+            </ul>
+        </div>
+    </footer>
+    <!--<script src="js/jquery-1.11.0.min.js" type="text/javascript"></script>-->
+    <!--<script src="dist/pageSwitch.min.js"></script>-->
+    <!--<script>-->
+        <!--$("#container").PageSwitch({-->
+            <!--direction:'horizontal',-->
+            <!--easing:'ease-in',-->
+            <!--duration:1000,-->
+            <!--autoPlay:true,-->
+            <!--loop:'false'-->
+        <!--});-->
+    <!--</script>-->
+    <script src="js/index.js"></script>
+</body>
+
+</html>

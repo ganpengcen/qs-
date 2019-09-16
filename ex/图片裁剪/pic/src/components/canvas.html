@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>transition</title>
+</head>
+<body>
+<p>canvas画圆</p>
+<div>
+  <canvas id="canvas" style="border: 1px solid red"></canvas>
+</div>
+<script>
+ let canvas = document.getElementByID('canvas')
+  let ctx = canvas.getContext("2d")
+  let img =  new Image();
+ img.src = '../../static/image/1.jpg'
+  ctx.save()
+  ctx.arc(100,100,50,2*Math.PI)
+  ctx.clip()
+  ctx.drawImage(img,50,50,100,100)
+</script>
+</body>
+</html>

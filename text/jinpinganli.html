@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>精品案例</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            list-style-type:none;
+            text-decoration: none;
+        }
+        /*这是头部*/
+        .head{
+            width: 100%;
+            height: 450px;
+            margin-bottom:68px;
+        }
+        .contain1{
+            width: 1280px;
+            height: 100px;
+            margin:0 auto;
+        }
+        .logo1{
+            margin-top: 36px;
+            margin-left: 225px;
+        }
+        .head .contain1 .nav{
+            width: 800px;
+            height: 100px;
+            float: right;
+        }
+        .head .contain1 ul{
+            width: 800px;
+            height: 100px;
+            text-align: center;
+            line-height: 100px;
+        }
+        .head .contain1 ul li{
+            display: inline-block;
+            margin-right: 30px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .head .contain1 ul li:hover{
+            color:#ff6537;
+        }
+
+        .head .contain1 ul li:first-of-type{
+            color:#ff6537;
+        }
+        .head .banner{
+            width:1920px;
+            height:600px;
+            margin:0 auto;
+            display: block;
+        }
+        /*主体部分*/
+        section{
+            width: 1280px;
+            height:1240px;
+            background-color:#ffffff;
+            margin: auto;
+            padding: 35px;
+        }
+        section .c_left{
+            height: 235px;
+            width: 270px;
+            display: inline-block;
+            border: 1px solid #8a8a8a;
+            margin-right:60px;
+            margin-left:40px;
+            vertical-align: top;
+        }
+        section .c_left .input li{
+            height: 46px;
+            width: 254px;
+            border-bottom:1px dashed #8a8a8a;
+            line-height:46px;
+            font-size:16px;
+            margin-left:8px;
+        }
+        section .c_left .input li:first-of-type{
+            width: 270px;
+            background-color:#ff6537;
+            border:none;
+            font-size:26px;
+            margin-left:0;
+        }
+        section .c_left .input li:last-of-type{
+            border: none;
+        }
+/*这是主体右边右边*/
+        .c_right{
+            width:860px;
+            height: 1210px;
+            background-color: #fff;
+            display: inline-block;
+        }
+        .c_right .liebiao{
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .right_img{
+            display: flex;
+            justify-content:space-between;
+            flex-wrap: wrap-reverse;
+        }
+        .right_img li{
+            width: 262px;
+            height: 348px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .right_img li a{
+            width: 262px;
+            height: 86px;
+            display: inline-block;
+            /*background-color:hotpink;*/
+            font-size: 16px;
+            color: #333333;
+            line-height:86px;
+        }
+        .yejiao{
+            width: 300px;
+            height: 50px;
+            text-align: center;
+            margin-top:80px;
+            margin-left:285px;
+            cursor: pointer;
+        }
+        footer{
+            width: 100%;
+            height: 300px;
+            margin:0 auto;
+        }
+        footer .foot{
+            width: 1920px;
+            height: 489px;
+            margin:0 auto;
+            background-image: url("qietu/shouye/footer.png");
+        }
+        footer .foot ul{
+            width:88px;
+            height: 342px;
+            font-size:22px;
+            color: #FFFFFF;
+            position: relative;
+            left: 820px;
+            top: 92px;
+        }
+        footer .foot ul li{
+            margin-bottom: 34px;
+        }
+        footer .foot ul li:hover{
+            color:#ff6537;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header class="head">
+    <div class="contain1">
+        <img src="qietu/shouye/logo.png" alt="" class="logo1">
+        <div class="nav">
+            <ul class="nav_ul">
+                <li>首页</li>
+                <li>精品案例</li>
+                <li>高端定制</li>
+                <li>设计团队</li>
+                <li>资讯中心</li>
+                <li>品质服务</li>
+            </ul>
+        </div>
+    </div>
+    <div class="banner">
+        <img src="qietu/liebiao/banner.png" alt="">
+    </div>
+</header>
+<section>
+    <div class="c_left">
+        <ul class="input">
+            <li >
+                <span style="margin-left:10px">家装案例</span>
+            </li>
+            <li>
+                <img src="qietu/liebiao/xiajiantou.png" alt="" style="float: right;margin-top: 20px;margin-right: 10px;">
+                <span style="margin-left:10px">户型</span>
+            </li>
+            <li>
+                <span style="margin-left:10px">风格</span>
+                <img src="qietu/liebiao/xiajiantou.png" alt="" style="float: right;margin-top: 20px;margin-right: 10px;">
+            </li>
+            <li>
+                <span style="margin-left:10px">功能</span>
+                <img src="qietu/liebiao/xiajiantou.png" alt="" style="float: right; margin-top: 20px;margin-right: 10px;">
+            </li>
+            <li>
+                <span style="margin-left:10px">面积</span>
+                <img src="qietu/liebiao/xiajiantou.png" alt="" style="float: right; margin-top: 20px;margin-right: 10px;">
+            </li>
+        </ul>
+    </div>
+    <div class="c_right">
+        <div class="liebiao"><img src="qietu/liebiao/chanpinliebiao.png" alt="" style="width: 860px;"></div>
+        <ul class="right_img">
+            <li><img src="qietu/liebiao/fenlei1.png" alt=""><a href="">白色公寓设计</a></li>
+            <li><img src="qietu/liebiao/fenlei2.png" alt=""><a href="">饭厅设计</a></li>
+            <li><img src="qietu/liebiao/fenlei3.png" alt=""><a href="">黑色公寓设计</a></li>
+            <li><img src="qietu/liebiao/fenlei4.png" alt=""><a href="">简易公寓设计</a></li>
+            <li><img src="qietu/liebiao/fenlei5.png" alt=""><a href="">开放式设计</a></li>
+            <li><img src="qietu/liebiao/fenlei6.png" alt=""><a href="">客厅设计</a></li>
+            <li><img src="qietu/liebiao/fenlei7.png" alt=""><a href="">美式公寓设计</a></li>
+            <li><img src="qietu/liebiao/fenlei8.png" alt=""><a href="">欧式公寓设计</a></li>
+            <li><img src="qietu/liebiao/fenlei9.png" alt=""><a href="">日式公寓设计</a></li>
+        </ul>
+        <div class="yejiao"><img src="qietu/liebiao/yejiao.png" alt=""></div>
+    </div>
+</section>
+    <footer>
+        <div class="foot">
+            <ul>
+                <li>首页</li>
+                <li>精品案例</li>
+                <li>高端定制</li>
+                <li>设计团队</li>
+                <li>资讯中心</li>
+                <li>品质服务</li>
+            </ul>
+        </div>
+    </footer>
+</body>
+</html>
